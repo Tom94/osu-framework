@@ -245,6 +245,8 @@ namespace osu.Framework.Platform
 
         private long lastDrawFrameId;
 
+
+
         protected virtual void DrawFrame()
         {
             if (Root == null)
@@ -253,7 +255,7 @@ namespace osu.Framework.Platform
             using (drawMonitor.BeginCollecting(PerformanceCollectionType.GLReset))
             {
                 GLWrapper.Reset(Root.DrawSize);
-                GLWrapper.ClearColour(Color4.Black);
+                GLWrapper.ClearColour(new Color4(0, 0, 0, 0));
             }
 
             while (!exitInitiated)

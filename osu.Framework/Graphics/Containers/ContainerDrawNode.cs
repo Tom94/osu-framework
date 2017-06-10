@@ -209,7 +209,6 @@ namespace osu.Framework.Graphics.Containers
 
             base.Draw(vertexAction);
 
-            drawEdgeEffect();
             if (MaskingInfo != null)
             {
                 MaskingInfo info = MaskingInfo.Value;
@@ -220,11 +219,13 @@ namespace osu.Framework.Graphics.Containers
             }
 
             if (Children != null)
-                foreach (DrawNode child in Children)
-                    child.Draw(vertexAction);
+                for (int i = Children.Count - 1; i >= 0; --i)
+                    Children[i].Draw(vertexAction);
 
             if (MaskingInfo != null)
                 GLWrapper.PopMaskingInfo();
+
+            drawEdgeEffect();
         }
     }
 }

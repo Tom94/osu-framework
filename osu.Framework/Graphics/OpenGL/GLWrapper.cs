@@ -106,6 +106,13 @@ namespace osu.Framework.Graphics.OpenGL
                 BlendRange = 1,
                 AlphaExponent = 1,
             }, true);
+
+            Shader.SetGlobalProperty(@"g_PremultiplyAlpha", true);
+            Shader.SetGlobalProperty(@"g_ScreenSize", size);
+            Shader.SetGlobalProperty(@"g_AlphaThreshold", 0.99f);
+
+            Shader.SetGlobalProperty(@"m_Sampler", 0);
+            Shader.SetGlobalProperty(@"m_ScreenSampler", 1);
         }
 
         // We initialize to an invalid value such that we are not missing an initial GL.ClearColor call.

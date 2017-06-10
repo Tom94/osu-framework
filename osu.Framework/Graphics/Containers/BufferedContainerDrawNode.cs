@@ -16,11 +16,15 @@ using osu.Framework.Graphics.Shaders;
 using System;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.OpenGL.Vertices;
+using System.Diagnostics;
+using osu.Framework.Graphics.OpenGL.Textures;
 
 namespace osu.Framework.Graphics.Containers
 {
     public class BufferedContainerDrawNode : ContainerDrawNode
     {
+        public bool IsRootContainer;
+
         public FrameBuffer[] FrameBuffers;
         public Color4 BackgroundColour;
 
@@ -175,9 +179,31 @@ namespace osu.Framework.Graphics.Containers
             }
         }
 
+        static TextureGL currentTexture;
+
         public override void Draw(Action<TexturedVertex2D> vertexAction)
         {
+            Trace.Assert(currentFrameBufferIndex == 0, "Can't happen.");
+
+            TextureGL previousTexture = IsRootContainer ? null : currentTexture;
+
             Vector2 frameBufferSize = new Vector2((float)Math.Ceiling(ScreenSpaceDrawRectangle.Width), (float)Math.Ceiling(ScreenSpaceDrawRectangle.Height));
+
+            if (!FrameBuffers[0].IsInitialized)
+                FrameBuffers[0].Initialize(true, FilteringMode);
+
+            // These additional render buffers are only required if e.g. depth
+            // or stencil information needs to also be stored somewhere.
+            foreach (var f in Formats)
+                FrameBuffers[0].Attach(f);
+
+            // This setter will also take care of allocating a texture of appropriate size within the framebuffer.
+            FrameBuffers[0].Size = frameBufferSize;
+
+            GL.ActiveTexture(TextureUnit.Texture1);
+            GLWrapper.BindTexture(currentTexture = FrameBuffers[0].Texture);
+            GL.ActiveTexture(TextureUnit.Texture0);
+
             if (UpdateVersion > DrawVersion.Value || frameBufferSize != FrameBuffers[0].Size)
             {
                 DrawVersion.Value = UpdateVersion;
@@ -194,14 +220,28 @@ namespace osu.Framework.Graphics.Containers
                     {
                         GL.Disable(EnableCap.ScissorTest);
 
+                        Shader.SetGlobalProperty(@"g_AlphaThreshold", 2f);
                         if (radiusX > 0) drawBlurredFrameBuffer(radiusX, BlurSigma.X, BlurRotation);
                         if (radiusY > 0) drawBlurredFrameBuffer(radiusY, BlurSigma.Y, BlurRotation + 90);
+                        Shader.SetGlobalProperty(@"g_AlphaThreshold", 0.99f);
 
                         GL.Enable(EnableCap.ScissorTest);
                     }
                 }
 
                 finalizeFrameBuffer();
+            }
+
+            if (previousTexture != null)
+            {
+                GL.ActiveTexture(TextureUnit.Texture1);
+                GLWrapper.BindTexture(currentTexture = previousTexture);
+                GL.ActiveTexture(TextureUnit.Texture0);
+            }
+            else
+            {
+                Trace.Assert(IsRootContainer);
+                currentTexture = null;
             }
 
             RectangleF drawRectangle = FilteringMode == All.Nearest
@@ -211,9 +251,15 @@ namespace osu.Framework.Graphics.Containers
             // Blit the final framebuffer to screen.
             GLWrapper.SetBlend(DrawInfo.Blending);
 
+            if (IsRootContainer)
+                Shader.SetGlobalProperty(@"g_AlphaThreshold", 2f);
+
             Shader.Bind();
             drawFrameBufferToBackBuffer(FrameBuffers[0], drawRectangle, DrawInfo.Colour);
             Shader.Unbind();
+
+            if (IsRootContainer)
+                Shader.SetGlobalProperty(@"g_AlphaThreshold", 0.99f);
         }
     }
 }

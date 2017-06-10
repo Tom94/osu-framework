@@ -11,6 +11,11 @@ varying vec4 v_TexRect;
 varying vec2 v_BlendRange;
 
 uniform sampler2D m_Sampler;
+uniform sampler2D m_ScreenSampler;
+
+uniform float g_AlphaThreshold;
+uniform vec2 g_ScreenSize;
+
 uniform float g_CornerRadius;
 uniform vec4 g_MaskingRect;
 uniform float g_BorderThickness;
@@ -21,6 +26,8 @@ uniform float g_MaskingBlendRange;
 uniform float g_AlphaExponent;
 
 uniform bool g_DiscardInner;
+
+uniform bool g_PremultiplyAlpha;
 
 float distanceFromRoundedRect()
 {
@@ -60,6 +67,11 @@ float distanceFromDrawingRect()
 
 void main(void)
 {
+	vec2 uv = gl_FragCoord.xy / g_ScreenSize;
+	float screenAlpha = texture2D(m_ScreenSampler, uv).a;
+	if (screenAlpha > g_AlphaThreshold)
+		discard;
+
 	float dist = distanceFromRoundedRect();
 	float alphaFactor = 1.0;
 
@@ -104,10 +116,15 @@ void main(void)
 	if (colourWeight <= 0.0)
 	{
 		gl_FragColor = toSRGB(vec4(g_BorderColour.rgb, g_BorderColour.a * alphaFactor));
+		if (g_PremultiplyAlpha)
+  			gl_FragColor = vec4(gl_FragColor.rgb * gl_FragColor.a, gl_FragColor.a);
 		return;
 	}
 
 	gl_FragColor = toSRGB(
 		colourWeight * vec4(v_Colour.rgb, v_Colour.a * alphaFactor) * texture2D(m_Sampler, v_TexCoord, -0.9) +
 		(1.0 - colourWeight) * g_BorderColour);
+
+	if (g_PremultiplyAlpha)
+  		gl_FragColor = vec4(gl_FragColor.rgb * gl_FragColor.a, gl_FragColor.a);
 }

@@ -39,6 +39,27 @@ namespace osu.Framework.Graphics.Containers
     /// </summary>
     public class BufferedContainer<T> : Container<T> where T : Drawable
     {
+        private bool isRootContainer;
+
+        /// <summary>
+        /// Controls the amount of blurring in two orthogonal directions (X and Y if
+        /// <see cref="BlurRotation"/> is zero).
+        /// Blur is parametrized by a gaussian image filter. This property controls
+        /// the standard deviation (sigma) of the gaussian kernel.
+        /// </summary>
+        public bool IsRootContainer
+        {
+            get { return isRootContainer; }
+            set
+            {
+                if (isRootContainer == value)
+                    return;
+
+                isRootContainer = value;
+                ForceRedraw();
+            }
+        }
+
         private Vector2 blurSigma = Vector2.Zero;
 
         /// <summary>
@@ -190,6 +211,7 @@ namespace osu.Framework.Graphics.Containers
             n.BlurSigma = BlurSigma;
             n.BlurRotation = BlurRotation;
             n.BlurShader = blurShader;
+            n.IsRootContainer = isRootContainer;
 
             base.ApplyDrawNode(node);
 

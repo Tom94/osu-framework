@@ -44,11 +44,13 @@ namespace osu.Framework
 
         public FontStore Fonts;
 
-        private readonly Container content;
+        private Container<Drawable> content;
         private PerformanceOverlay performanceContainer;
         internal DrawVisualiser DrawVisualiser;
 
         private LogOverlay logOverlay;
+
+        private BufferedContainer rootBuffer;
 
         protected override Container<Drawable> Content => content;
 
@@ -57,20 +59,13 @@ namespace osu.Framework
             AlwaysReceiveInput = true;
             RelativeSizeAxes = Axes.Both;
 
-            AddInternal(new Drawable[]
+            content = new Container
             {
-                content = new Container
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    RelativeSizeAxes = Axes.Both,
-                    AlwaysReceiveInput = true,
-                },
-                new GlobalHotkeys
-                {
-                    Handler = globalKeyDown
-                }
-            });
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                RelativeSizeAxes = Axes.Both,
+                AlwaysReceiveInput = true,
+            };
         }
 
         private void addDebugTools()
@@ -78,12 +73,12 @@ namespace osu.Framework
             LoadComponentAsync(DrawVisualiser = new DrawVisualiser
             {
                 Depth = float.MinValue / 2,
-            }, AddInternal);
+            }, rootBuffer.Add);
 
             LoadComponentAsync(logOverlay = new LogOverlay
             {
                 Depth = float.MinValue / 2,
-            }, AddInternal);
+            }, rootBuffer.Add);
         }
 
         /// <summary>
@@ -132,6 +127,26 @@ namespace osu.Framework
                 ScaleAdjust = 100
             };
             Dependencies.Cache(Fonts);
+
+            AddInternal(new Drawable[]
+            {
+                rootBuffer = new BufferedContainer
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    RelativeSizeAxes = Axes.Both,
+                    AlwaysReceiveInput = true,
+                    IsRootContainer = true,
+                    Children = new Drawable[]
+                    {
+                        content,
+                        new GlobalHotkeys
+                        {
+                            Handler = globalKeyDown
+                        }
+                    },
+                },
+            });
         }
 
         protected override void LoadComplete()
@@ -159,7 +174,7 @@ namespace osu.Framework
 
                 performanceContainer.CreateDisplays();
 
-                AddInternal(overlay);
+                rootBuffer.Add(overlay);
             });
 
             addDebugTools();

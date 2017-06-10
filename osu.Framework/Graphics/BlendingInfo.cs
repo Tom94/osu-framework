@@ -18,24 +18,24 @@ namespace osu.Framework.Graphics
             {
                 case BlendingMode.Inherit:
                 case BlendingMode.Mixture:
-                    Source = BlendingFactorSrc.SrcAlpha;
-                    Destination = BlendingFactorDest.OneMinusSrcAlpha;
-                    SourceAlpha = BlendingFactorSrc.One;
+                    Source = BlendingFactorSrc.OneMinusDstAlpha;
+                    Destination = BlendingFactorDest.One;
+                    SourceAlpha = BlendingFactorSrc.OneMinusDstAlpha;
                     DestinationAlpha = BlendingFactorDest.One;
                     break;
 
                 case BlendingMode.Additive:
-                    Source = BlendingFactorSrc.SrcAlpha;
+                    Source = BlendingFactorSrc.OneMinusDstAlpha;
                     Destination = BlendingFactorDest.One;
-                    SourceAlpha = BlendingFactorSrc.One;
+                    SourceAlpha = BlendingFactorSrc.Zero;
                     DestinationAlpha = BlendingFactorDest.One;
                     break;
 
                 default:
-                    Source = BlendingFactorSrc.One;
-                    Destination = BlendingFactorDest.Zero;
-                    SourceAlpha = BlendingFactorSrc.One;
-                    DestinationAlpha = BlendingFactorDest.Zero;
+                    Source = BlendingFactorSrc.OneMinusDstAlpha;
+                    Destination = BlendingFactorDest.One;
+                    SourceAlpha = BlendingFactorSrc.OneMinusDstAlpha;
+                    DestinationAlpha = BlendingFactorDest.One;
                     break;
             }
         }
