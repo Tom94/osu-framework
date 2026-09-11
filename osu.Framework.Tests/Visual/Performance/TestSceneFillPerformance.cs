@@ -54,7 +54,7 @@ namespace osu.Framework.Tests.Visual.Performance
 
             AddLabel("Drawables");
 
-            AddSliderStep("count", 1, 100, 100, v => DrawableCount.Value = v);
+            AddSliderStep("count", 1, 100, 1000, v => DrawableCount.Value = v);
             AddToggleStep("gradient colour", v => GradientColour.Value = v);
             AddToggleStep("randomise colour", v => RandomiseColour.Value = v);
 
