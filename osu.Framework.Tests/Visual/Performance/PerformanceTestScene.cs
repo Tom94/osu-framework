@@ -34,6 +34,7 @@ namespace osu.Framework.Tests.Visual.Performance
         private void recreateBuffer(float renderScale)
         {
             buffer.Clear(false);
+
             if (renderScale < 1f)
             {
                 base.Content.Child = buffer = new BufferedContainer
