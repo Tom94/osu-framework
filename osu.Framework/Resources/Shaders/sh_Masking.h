@@ -55,17 +55,30 @@ highp float distanceFromDrawingRect(mediump vec2 texCoord)
 
 lowp vec4 getBorderColour()
 {
-    highp vec2 relativeTexCoord = v_MaskingPosition / (g_MaskingRect.zw - g_MaskingRect.xy);
-    lowp vec4 top = mix(g_BorderColour[0], g_BorderColour[2], relativeTexCoord.x);
-    lowp vec4 bottom = mix(g_BorderColour[1], g_BorderColour[3], relativeTexCoord.x);
-    return mix(top, bottom, relativeTexCoord.y);
+	highp vec2 relativeTexCoord = v_MaskingPosition / (g_MaskingRect.zw - g_MaskingRect.xy);
+	lowp vec4 top = mix(g_BorderColour[0], g_BorderColour[2], relativeTexCoord.x);
+	lowp vec4 bottom = mix(g_BorderColour[1], g_BorderColour[3], relativeTexCoord.x);
+	return mix(top, bottom, relativeTexCoord.y);
+}
+
+lowp float mean3(vec3 v) { return dot(v, vec3(1.0 / 3.0)); }
+
+lowp vec4 applyColour(lowp vec4 texel)
+{
+	if (g_LerpToBlack)
+	{
+		lowp vec4 weight = vec4(v_Colour.rgb, mean3(v_Colour.rgb));
+		return mix(vec4(0.0, 0.0, 0.0, 1.0), texel, weight) * vec4(1.0, 1.0, 1.0, v_Colour.a);
+	}
+	else
+		return v_Colour * texel;
 }
 
 lowp vec4 getRoundedColor(lowp vec4 texel, mediump vec2 texCoord)
 {
 	if (!g_IsMasking && v_BlendRange == vec2(0.0))
 	{
-		return v_Colour * texel;
+		return applyColour(texel);
 	}
 
 	highp float dist = distanceFromRoundedRect(vec2(0.0), g_CornerRadius);
@@ -113,7 +126,7 @@ lowp vec4 getRoundedColor(lowp vec4 texel, mediump vec2 texCoord)
 	highp float borderStart = 1.0 + fadeStart - g_BorderThickness;
 	lowp float colourWeight = min(borderStart - dist, 1.0);
 
-	lowp vec4 contentColour = v_Colour * texel;
+	lowp vec4 contentColour = applyColour(texel);
 
 	if (colourWeight == 1.0)
 		return vec4(contentColour.rgb, contentColour.a * alphaFactor);

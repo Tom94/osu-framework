@@ -381,7 +381,7 @@ namespace osu.Framework.Graphics.Containers
                 var blending = Blending;
                 blending.ApplyDefaultToInherited();
 
-                return new DrawColourInfo(Color4.White, blending);
+                return new DrawColourInfo(Color4.White, blending, LerpToBlack ?? base.DrawColourInfo.LerpToBlack);
             }
         }
 

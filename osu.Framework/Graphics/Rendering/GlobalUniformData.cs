@@ -32,7 +32,11 @@ namespace osu.Framework.Graphics.Rendering
         public UniformVector2 EdgeOffset;
         public UniformBool DiscardInner;
         public UniformFloat InnerCornerRadius;
+
+        public UniformBool LerpToBlack;
+
         public UniformInt WrapModeS;
         public UniformInt WrapModeT;
+        public UniformPadding12 Pad12;
     }
 }

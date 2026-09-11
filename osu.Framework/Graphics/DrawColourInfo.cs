@@ -11,13 +11,15 @@ namespace osu.Framework.Graphics
     {
         public ColourInfo Colour;
         public BlendingParameters Blending;
+        public bool LerpToBlack;
 
-        public DrawColourInfo(ColourInfo? colour = null, BlendingParameters? blending = null)
+        public DrawColourInfo(ColourInfo? colour = null, BlendingParameters? blending = null, bool lerpToBlack = false)
         {
             Colour = colour ?? ColourInfo.SingleColour(Color4.White);
             Blending = blending ?? BlendingParameters.Inherit;
+            LerpToBlack = lerpToBlack;
         }
 
-        public readonly bool Equals(DrawColourInfo other) => Colour.Equals(other.Colour) && Blending == other.Blending;
+        public readonly bool Equals(DrawColourInfo other) => Colour.Equals(other.Colour) && Blending == other.Blending && LerpToBlack == other.LerpToBlack;
     }
 }

@@ -84,6 +84,8 @@ namespace osu.Framework.Graphics
             if (SetBlending)
                 renderer.SetBlend(DrawColourInfo.Blending);
 
+            renderer.SetLerpToBlack(DrawColourInfo.LerpToBlack);
+
             renderer.BackbufferDepth.Set(drawDepth);
         }
 
@@ -100,6 +102,8 @@ namespace osu.Framework.Graphics
         {
             if (HasOwnOpaqueInterior)
                 renderer.BackbufferDepth.Increment();
+
+            renderer.SetLerpToBlack(DrawColourInfo.LerpToBlack);
         }
 
         protected internal static void DrawOther(DrawNode node, IRenderer renderer)

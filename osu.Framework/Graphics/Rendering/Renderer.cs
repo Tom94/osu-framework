@@ -17,6 +17,7 @@ using osu.Framework.Graphics.Shaders.Types;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
 using osu.Framework.Lists;
+using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Statistics;
 using osu.Framework.Threading;
@@ -71,6 +72,7 @@ namespace osu.Framework.Graphics.Rendering
         public WrapMode CurrentWrapModeT { get; private set; }
         public bool IsMaskingActive { get; private set; }
         public bool UsingBackbuffer { get; private set; }
+        public bool LerpToBlack { get; private set; }
         public Texture WhitePixel => whitePixel.Value;
         DepthValue IRenderer.BackbufferDepth => backBufferDepth;
 
@@ -422,6 +424,17 @@ namespace osu.Framework.Graphics.Rendering
         /// </summary>
         /// <param name="blendingMask">The blending mask.</param>
         protected abstract void SetBlendMaskImplementation(BlendingMask blendingMask);
+
+        public void SetLerpToBlack(bool lerpToBlack)
+        {
+            if (LerpToBlack == lerpToBlack)
+                return;
+
+            FlushCurrentBatch(FlushBatchSource.SetLerpToBlack);
+
+            LerpToBlack = lerpToBlack;
+            globalUniformsChanged = true;
+        }
 
         #endregion
 
@@ -1009,6 +1022,7 @@ namespace osu.Framework.Graphics.Rendering
                     InnerCornerRadius = currentMaskingInfo.Hollow
                         ? currentMaskingInfo.HollowCornerRadius
                         : globalUniformBuffer.Data.InnerCornerRadius,
+                    LerpToBlack = LerpToBlack,
                     WrapModeS = (int)CurrentWrapModeS,
                     WrapModeT = (int)CurrentWrapModeT
                 };

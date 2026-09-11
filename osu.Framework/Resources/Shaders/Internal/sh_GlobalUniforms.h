@@ -33,6 +33,9 @@ layout(std140, set = -1, binding = 0) uniform g_GlobalUniforms
     bool g_DiscardInner;
     highp float g_InnerCornerRadius;
 
+    // Whether to lerp black instead of multiplying with v_Colour
+    bool g_LerpToBlack;
+
     // 0 -> None
     // 1 -> ClampToEdge
     // 2 -> ClampToBorder

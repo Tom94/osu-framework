@@ -255,6 +255,12 @@ namespace osu.Framework.Graphics.Rendering
         void SetBlendMask(BlendingMask blendingMask);
 
         /// <summary>
+        /// Sets lerp colour mode as opposed to the default multiplicative colour.
+        /// </summary>
+        /// <param name="lerpToBlack">Whether to lerp.</param>
+        void SetLerpToBlack(bool lerpToBlack);
+
+        /// <summary>
         /// Applies a new viewport rectangle.
         /// </summary>
         /// <param name="viewport">The viewport rectangle.</param>

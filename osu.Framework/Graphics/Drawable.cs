@@ -1308,6 +1308,27 @@ namespace osu.Framework.Graphics
             }
         }
 
+        private bool? lerpToBlack = null;
+
+        /// <summary>
+        /// Determines how this <see cref="Drawable"/>'s <see cref="Colour" /> is applied: if true, the colour is lerped to black instead of being multiplied,
+        /// if null, the value is inherited from <see cref="Parent"/>. This is useful for semi-transparent drawables that should become solid black instead of
+        /// retaining their transparency when faded out.
+        /// </summary>
+        public bool? LerpToBlack
+        {
+            get => lerpToBlack;
+            set
+            {
+                if (lerpToBlack == value)
+                    return;
+
+                lerpToBlack = value;
+
+                Invalidate(Invalidation.Colour);
+            }
+        }
+
         private float alpha = 1.0f;
 
         /// <summary>
@@ -1638,6 +1659,8 @@ namespace osu.Framework.Graphics
         private DrawColourInfo computeDrawColourInfo()
         {
             DrawColourInfo ci = Parent?.DrawColourInfo ?? new DrawColourInfo(null);
+            if (lerpToBlack.HasValue)
+                ci.LerpToBlack = lerpToBlack.Value;
 
             BlendingParameters localBlending = Blending;
 
