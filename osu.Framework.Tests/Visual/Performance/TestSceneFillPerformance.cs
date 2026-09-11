@@ -44,7 +44,6 @@ namespace osu.Framework.Tests.Visual.Performance
             }
         }
 
-        protected readonly BindableFloat DrawableSize = new BindableFloat();
         protected readonly BindableInt DrawableCount = new BindableInt();
         protected readonly BindableBool GradientColour = new BindableBool();
         protected readonly BindableBool RandomiseColour = new BindableBool();
@@ -55,15 +54,11 @@ namespace osu.Framework.Tests.Visual.Performance
 
             AddLabel("Drawables");
 
-            AddSliderStep("size", 1f, 128f, 20f, v => DrawableSize.Value = v);
             AddSliderStep("count", 1, 100, 100, v => DrawableCount.Value = v);
-
             AddToggleStep("gradient colour", v => GradientColour.Value = v);
             AddToggleStep("randomise colour", v => RandomiseColour.Value = v);
 
             DrawableCount.BindValueChanged(_ => adjustDrawableCount(), true);
-
-            DrawableSize.BindValueChanged(_ => updateMetrics());
             GradientColour.BindValueChanged(_ => updateMetrics());
             RandomiseColour.BindValueChanged(_ => updateMetrics());
 
@@ -101,8 +96,6 @@ namespace osu.Framework.Tests.Visual.Performance
 
         private void updateMetrics(Drawable drawable)
         {
-            drawable.Size = new Vector2(DrawableSize.Value);
-
             if (GradientColour.Value)
             {
                 drawable.Colour = new ColourInfo
