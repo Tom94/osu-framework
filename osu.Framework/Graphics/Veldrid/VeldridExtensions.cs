@@ -5,22 +5,24 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using NeoVeldrid;
 using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Logging;
 using osuTK.Graphics;
-using SharpGen.Runtime;
-using Veldrid;
-using Veldrid.MetalBindings;
-using Veldrid.OpenGLBindings;
-using Vortice.Direct3D11;
-using Vortice.DXGI;
-using Vulkan;
-using GraphicsBackend = Veldrid.GraphicsBackend;
-using PrimitiveTopology = Veldrid.PrimitiveTopology;
-using StencilOperation = Veldrid.StencilOperation;
+using Silk.NET.Core.Native;
+using Silk.NET.Direct3D11;
+using Silk.NET.DXGI;
+using Silk.NET.OpenGL;
+using Silk.NET.Vulkan;
+using BlendFactor = NeoVeldrid.BlendFactor;
+using GraphicsBackend = NeoVeldrid.GraphicsBackend;
+using PixelFormat = NeoVeldrid.PixelFormat;
+using PrimitiveTopology = NeoVeldrid.PrimitiveTopology;
+using Shader = NeoVeldrid.Shader;
+using StencilOperation = NeoVeldrid.StencilOperation;
 using VertexAttribPointerType = osuTK.Graphics.ES30.VertexAttribPointerType;
 
 namespace osu.Framework.Graphics.Veldrid
@@ -119,10 +121,10 @@ namespace osu.Framework.Graphics.Veldrid
             switch (texturePixelFormat)
             {
                 case TexturePixelFormat.R8G8B8A8Float:
-                    return PixelFormat.R8G8B8A8UNorm;
+                    return PixelFormat.R8_G8_B8_A8_UNorm;
 
                 case TexturePixelFormat.R16Float:
-                    return PixelFormat.R16Float;
+                    return PixelFormat.R16_Float;
 
                 default:
                     throw new ArgumentException($"Unsupported render buffer format: {texturePixelFormat}", nameof(texturePixelFormat));
@@ -138,19 +140,19 @@ namespace osu.Framework.Graphics.Veldrid
                 switch (renderBufferFormats[i])
                 {
                     case RenderBufferFormat.D16:
-                        pixelFormats[i] = PixelFormat.R16UNorm;
+                        pixelFormats[i] = PixelFormat.R16_UNorm;
                         break;
 
                     case RenderBufferFormat.D32:
-                        pixelFormats[i] = PixelFormat.R32Float;
+                        pixelFormats[i] = PixelFormat.R32_Float;
                         break;
 
                     case RenderBufferFormat.D24S8:
-                        pixelFormats[i] = PixelFormat.D24UNormS8UInt;
+                        pixelFormats[i] = PixelFormat.D24_UNorm_S8_UInt;
                         break;
 
                     case RenderBufferFormat.D32S8:
-                        pixelFormats[i] = PixelFormat.D32FloatS8UInt;
+                        pixelFormats[i] = PixelFormat.D32_Float_S8_UInt;
                         break;
 
                     default:
@@ -166,10 +168,10 @@ namespace osu.Framework.Graphics.Veldrid
             switch (mode)
             {
                 case TextureFilteringMode.Linear:
-                    return SamplerFilter.MinLinearMagLinearMipLinear;
+                    return SamplerFilter.MinLinear_MagLinear_MipLinear;
 
                 case TextureFilteringMode.Nearest:
-                    return SamplerFilter.MinPointMagPointMipPoint;
+                    return SamplerFilter.MinPoint_MagPoint_MipPoint;
 
                 default:
                     throw new ArgumentOutOfRangeException(nameof(mode));
@@ -362,23 +364,25 @@ namespace osu.Framework.Graphics.Veldrid
 
         public static void LogD3D11(this GraphicsDevice device, out int maxTextureSize)
         {
-            Debug.Assert(device.BackendType == GraphicsBackend.Direct3D11);
+            maxTextureSize = 16384;
+            return;
+            // Debug.Assert(device.BackendType == GraphicsBackend.Direct3D11);
 
-            var info = device.GetD3D11Info();
-            var dxgiAdapter = MarshallingHelpers.FromPointer<IDXGIAdapter>(info.Adapter).AsNonNull();
-            var d3D11Device = MarshallingHelpers.FromPointer<ID3D11Device>(info.Device).AsNonNull();
+            // var info = device.GetD3D11Info();
+            // var dxgiAdapter = MarshallingHelpers.FromPointer<IDXGIAdapter>(info.Adapter).AsNonNull();
+            // var d3D11Device = MarshallingHelpers.FromPointer<ID3D11Device>(info.Device).AsNonNull();
 
-            maxTextureSize = ID3D11Resource.MaximumTexture2DSize;
+            // maxTextureSize = ID3D11Resource.MaximumTexture2DSize;
 
-            Logger.Log($@"Direct3D 11 Initialized
-                        Direct3D 11 Feature Level:           {d3D11Device.FeatureLevel.ToString().Replace("Level_", string.Empty).Replace("_", ".")}
-                        Direct3D 11 Adapter:                 {dxgiAdapter.Description.Description}
-                        Direct3D 11 Dedicated Video Memory:  {dxgiAdapter.Description.DedicatedVideoMemory / 1024 / 1024} MB
-                        Direct3D 11 Dedicated System Memory: {dxgiAdapter.Description.DedicatedSystemMemory / 1024 / 1024} MB
-                        Direct3D 11 Shared System Memory:    {dxgiAdapter.Description.SharedSystemMemory / 1024 / 1024} MB");
+            // Logger.Log($@"Direct3D 11 Initialized
+            //             Direct3D 11 Feature Level:           {d3D11Device.FeatureLevel.ToString().Replace("Level_", string.Empty).Replace("_", ".")}
+            //             Direct3D 11 Adapter:                 {dxgiAdapter.Description.Description}
+            //             Direct3D 11 Dedicated Video Memory:  {dxgiAdapter.Description.DedicatedVideoMemory / 1024 / 1024} MB
+            //             Direct3D 11 Dedicated System Memory: {dxgiAdapter.Description.DedicatedSystemMemory / 1024 / 1024} MB
+            //             Direct3D 11 Shared System Memory:    {dxgiAdapter.Description.SharedSystemMemory / 1024 / 1024} MB");
         }
 
-        public static unsafe void LogOpenGL(this GraphicsDevice device, out int maxTextureSize)
+        public static unsafe void LogOpenGL(this GraphicsDevice device, GL gl, out int maxTextureSize)
         {
             var info = device.GetOpenGLInfo();
 
@@ -392,101 +396,79 @@ namespace osu.Framework.Graphics.Veldrid
 
             info.ExecuteOnGLThread(() =>
             {
-                version = Marshal.PtrToStringUTF8((IntPtr)OpenGLNative.glGetString(StringName.Version)) ?? string.Empty;
-                renderer = Marshal.PtrToStringUTF8((IntPtr)OpenGLNative.glGetString(StringName.Renderer)) ?? string.Empty;
-                vendor = Marshal.PtrToStringUTF8((IntPtr)OpenGLNative.glGetString(StringName.Vendor)) ?? string.Empty;
-                glslVersion = Marshal.PtrToStringUTF8((IntPtr)OpenGLNative.glGetString(StringName.ShadingLanguageVersion)) ?? string.Empty;
+                version = info.Version;
+                glslVersion = info.ShadingLanguageVersion;
+                renderer = gl.GetStringS(StringName.Renderer) ?? string.Empty;
+                vendor = gl.GetStringS(StringName.Vendor) ?? string.Empty;
                 extensions = string.Join(' ', info.Extensions);
 
-                int size;
-                OpenGLNative.glGetIntegerv(GetPName.MaxTextureSize, &size);
+                gl.GetInteger(GLEnum.MaxTextureSize, out int size);
                 glMaxTextureSize = size;
             });
 
             maxTextureSize = glMaxTextureSize;
 
-            Logger.Log($@"GL Initialized
-                                    GL Version:                 {version}
-                                    GL Renderer:                {renderer}
-                                    GL Shader Language version: {glslVersion}
-                                    GL Vendor:                  {vendor}
-                                    GL Extensions:              {extensions}");
+            // Logger.Log($@"GL Initialized
+            //                         GL Version:                 {version}
+            //                         GL Renderer:                {renderer}
+            //                         GL Shader Language version: {glslVersion}
+            //                         GL Vendor:                  {vendor}
+            //                         GL Extensions:              {extensions}");
         }
 
         public static unsafe void LogVulkan(this GraphicsDevice device, out int maxTextureSize)
         {
-            Debug.Assert(device.BackendType == GraphicsBackend.Vulkan);
+            maxTextureSize = 16384;
+            return;
+            // Debug.Assert(device.BackendType == GraphicsBackend.Vulkan);
 
-            var info = device.GetVulkanInfo();
-            IntPtr physicalDevice = info.PhysicalDevice;
+            // var info = device.GetVulkanInfo();
+            // IntPtr physicalDevice = info.PhysicalDevice;
 
-            uint instanceExtensionsCount = 0;
-            var result = VulkanNative.vkEnumerateInstanceExtensionProperties((byte*)null, ref instanceExtensionsCount, IntPtr.Zero);
+            // uint instanceExtensionsCount = 0;
+            // var result = VulkanNative.vkEnumerateInstanceExtensionProperties((byte*)null, ref instanceExtensionsCount, IntPtr.Zero);
 
-            var instanceExtensions = new VkExtensionProperties[(int)instanceExtensionsCount];
-            if (result == VkResult.Success && instanceExtensionsCount > 0)
-                VulkanNative.vkEnumerateInstanceExtensionProperties((byte*)null, ref instanceExtensionsCount, ref instanceExtensions[0]);
+            // var instanceExtensions = new VkExtensionProperties[(int)instanceExtensionsCount];
+            // if (result == VkResult.Success && instanceExtensionsCount > 0)
+            //     VulkanNative.vkEnumerateInstanceExtensionProperties((byte*)null, ref instanceExtensionsCount, ref instanceExtensions[0]);
 
-            uint deviceExetnsionsCount = 0;
-            result = VulkanNative.vkEnumerateDeviceExtensionProperties(physicalDevice, (byte*)null, ref deviceExetnsionsCount, IntPtr.Zero);
+            // uint deviceExetnsionsCount = 0;
+            // result = VulkanNative.vkEnumerateDeviceExtensionProperties(physicalDevice, (byte*)null, ref deviceExetnsionsCount, IntPtr.Zero);
 
-            var deviceExtensions = new VkExtensionProperties[(int)deviceExetnsionsCount];
-            if (result == VkResult.Success && deviceExetnsionsCount > 0)
-                VulkanNative.vkEnumerateDeviceExtensionProperties(physicalDevice, (byte*)null, ref deviceExetnsionsCount, ref deviceExtensions[0]);
+            // var deviceExtensions = new VkExtensionProperties[(int)deviceExetnsionsCount];
+            // if (result == VkResult.Success && deviceExetnsionsCount > 0)
+            //     VulkanNative.vkEnumerateDeviceExtensionProperties(physicalDevice, (byte*)null, ref deviceExetnsionsCount, ref deviceExtensions[0]);
 
-            VkPhysicalDeviceProperties properties;
-            VulkanNative.vkGetPhysicalDeviceProperties(physicalDevice, &properties);
+            // VkPhysicalDeviceProperties properties;
+            // VulkanNative.vkGetPhysicalDeviceProperties(physicalDevice, &properties);
 
-            maxTextureSize = (int)properties.limits.maxImageDimension2D;
+            // maxTextureSize = (int)properties.limits.maxImageDimension2D;
 
-            string vulkanName = RuntimeInfo.IsApple ? "MoltenVK" : "Vulkan";
+            // string vulkanName = RuntimeInfo.IsApple ? "MoltenVK" : "Vulkan";
 
-            List<string?> extensionNames = new List<string?>();
+            // List<string?> extensionNames = new List<string?>();
 
-            foreach (var ext in instanceExtensions)
-                extensionNames.Add(Marshal.PtrToStringUTF8((IntPtr)ext.extensionName));
-            foreach (var ext in deviceExtensions)
-                extensionNames.Add(Marshal.PtrToStringUTF8((IntPtr)ext.extensionName));
+            // foreach (var ext in instanceExtensions)
+            //     extensionNames.Add(Marshal.PtrToStringUTF8((IntPtr)ext.extensionName));
+            // foreach (var ext in deviceExtensions)
+            //     extensionNames.Add(Marshal.PtrToStringUTF8((IntPtr)ext.extensionName));
 
-            string apiVersion = $"{properties.apiVersion >> 22}.{(properties.apiVersion >> 12) & 0x3FFU}.{properties.apiVersion & 0xFFFU}";
-            string driverVersion;
+            // string apiVersion = $"{properties.apiVersion >> 22}.{(properties.apiVersion >> 12) & 0x3FFU}.{properties.apiVersion & 0xFFFU}";
+            // string driverVersion;
 
-            // https://github.com/SaschaWillems/vulkan.gpuinfo.org/blob/1e6ca6e3c0763daabd6a101b860ab4354a07f5d3/functions.php#L293-L325
-            if (properties.vendorID == 0x10DE) // NVIDIA's versioning convention
-                driverVersion = $"{properties.driverVersion >> 22}.{(properties.driverVersion >> 14) & 0x0FFU}.{(properties.driverVersion >> 6) & 0x0FFU}.{properties.driverVersion & 0x003U}";
-            else if (properties.vendorID == 0x8086 && RuntimeInfo.OS == RuntimeInfo.Platform.Windows) // Intel's versioning convention on Windows
-                driverVersion = $"{properties.driverVersion >> 22}.{properties.driverVersion & 0x3FFFU}";
-            else // Vulkan's convention
-                driverVersion = $"{properties.driverVersion >> 22}.{(properties.driverVersion >> 12) & 0x3FFU}.{properties.driverVersion & 0xFFFU}";
+            // // https://github.com/SaschaWillems/vulkan.gpuinfo.org/blob/1e6ca6e3c0763daabd6a101b860ab4354a07f5d3/functions.php#L293-L325
+            // if (properties.vendorID == 0x10DE) // NVIDIA's versioning convention
+            //     driverVersion = $"{properties.driverVersion >> 22}.{(properties.driverVersion >> 14) & 0x0FFU}.{(properties.driverVersion >> 6) & 0x0FFU}.{properties.driverVersion & 0x003U}";
+            // else if (properties.vendorID == 0x8086 && RuntimeInfo.OS == RuntimeInfo.Platform.Windows) // Intel's versioning convention on Windows
+            //     driverVersion = $"{properties.driverVersion >> 22}.{properties.driverVersion & 0x3FFFU}";
+            // else // Vulkan's convention
+            //     driverVersion = $"{properties.driverVersion >> 22}.{(properties.driverVersion >> 12) & 0x3FFU}.{properties.driverVersion & 0xFFFU}";
 
-            Logger.Log($@"{vulkanName} Initialized
-                                    {vulkanName} API Version:    {apiVersion}
-                                    {vulkanName} Driver Version: {driverVersion}
-                                    {vulkanName} Device:         {Marshal.PtrToStringUTF8((IntPtr)properties.deviceName)}
-                                    {vulkanName} Extensions:     {string.Join(',', extensionNames)}");
-        }
-
-        public static void LogMetal(this GraphicsDevice device, out int maxTextureSize)
-        {
-            Debug.Assert(device.BackendType == GraphicsBackend.Metal);
-
-            var info = device.GetMetalInfo();
-
-            string[] featureSetParts = info.MaxFeatureSet.ToString().Split('_');
-            string featureDevice = featureSetParts[0];
-            string featureFamily = featureSetParts[1].Replace("GPUFamily", string.Empty);
-            string featureVersion = featureSetParts[2];
-
-            // https://developer.apple.com/metal/Metal-Feature-Set-Tables.pdf
-            if (info.MaxFeatureSet <= MTLFeatureSet.iOS_GPUFamily4_v1)
-                maxTextureSize = info.MaxFeatureSet <= MTLFeatureSet.iOS_GPUFamily1_v4 ? 8192 : 16384;
-            else if (info.MaxFeatureSet <= MTLFeatureSet.tvOS_GPUFamily2_v1)
-                maxTextureSize = info.MaxFeatureSet <= MTLFeatureSet.tvOS_GPUFamily1_v3 ? 8192 : 16384;
-            else
-                maxTextureSize = 16384;
-
-            Logger.Log($@"Metal Initialized
-                        Metal Feature Set: {featureDevice} GPU family {featureFamily} ({featureVersion})");
+            // Logger.Log($@"{vulkanName} Initialized
+            //                         {vulkanName} API Version:    {apiVersion}
+            //                         {vulkanName} Driver Version: {driverVersion}
+            //                         {vulkanName} Device:         {Marshal.PtrToStringUTF8((IntPtr)properties.deviceName)}
+            //                         {vulkanName} Extensions:     {string.Join(',', extensionNames)}");
         }
     }
 }

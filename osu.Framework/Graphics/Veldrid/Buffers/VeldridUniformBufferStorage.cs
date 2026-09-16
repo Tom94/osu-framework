@@ -4,7 +4,7 @@
 using System;
 using System.Runtime.InteropServices;
 using osu.Framework.Platform;
-using Veldrid;
+using NeoVeldrid;
 
 namespace osu.Framework.Graphics.Veldrid.Buffers
 {

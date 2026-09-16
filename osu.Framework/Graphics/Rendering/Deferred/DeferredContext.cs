@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using osu.Framework.Graphics.Rendering.Deferred.Allocation;
 using osu.Framework.Graphics.Rendering.Deferred.Events;
 using osu.Framework.Graphics.Veldrid.Pipelines;
-using Veldrid;
+using NeoVeldrid;
 
 namespace osu.Framework.Graphics.Rendering.Deferred
 {

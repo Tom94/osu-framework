@@ -7,7 +7,7 @@ using System.Diagnostics;
 using osu.Framework.Development;
 using osu.Framework.Graphics.Rendering;
 using osu.Framework.Statistics;
-using Veldrid;
+using NeoVeldrid;
 
 namespace osu.Framework.Graphics.Veldrid.Buffers
 {

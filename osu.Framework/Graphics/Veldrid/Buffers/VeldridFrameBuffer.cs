@@ -8,8 +8,8 @@ using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Graphics.Veldrid.Textures;
 using osuTK;
-using Veldrid;
-using Texture = Veldrid.Texture;
+using NeoVeldrid;
+using Texture = NeoVeldrid.Texture;
 
 namespace osu.Framework.Graphics.Veldrid.Buffers
 {
@@ -47,7 +47,7 @@ namespace osu.Framework.Graphics.Veldrid.Buffers
             }
         }
 
-        public VeldridFrameBuffer(VeldridRenderer renderer, PixelFormat textureFormat = PixelFormat.R8G8B8A8UNorm, PixelFormat[]? formats = null, SamplerFilter filteringMode = SamplerFilter.MinLinearMagLinearMipLinear)
+        public VeldridFrameBuffer(VeldridRenderer renderer, PixelFormat textureFormat = PixelFormat.R8_G8_B8_A8_UNorm, PixelFormat[]? formats = null, SamplerFilter filteringMode = SamplerFilter.MinLinear_MagLinear_MipLinear)
         {
             // todo: we probably want the arguments separated to "PixelFormat[] colorFormats, PixelFormat depthFormat".
             if (formats?.Length > 1)
@@ -147,7 +147,7 @@ namespace osu.Framework.Graphics.Veldrid.Buffers
         {
             protected override TextureUsage Usages => base.Usages | TextureUsage.RenderTarget;
 
-            public FrameBufferTexture(VeldridRenderer renderer, PixelFormat textureFormat, SamplerFilter filteringMode = SamplerFilter.MinLinearMagLinearMipLinear)
+            public FrameBufferTexture(VeldridRenderer renderer, PixelFormat textureFormat, SamplerFilter filteringMode = SamplerFilter.MinLinear_MagLinear_MipLinear)
                 : base(renderer, 1, 1, textureFormat, true, filteringMode)
             {
                 BypassTextureUploadQueueing = true;

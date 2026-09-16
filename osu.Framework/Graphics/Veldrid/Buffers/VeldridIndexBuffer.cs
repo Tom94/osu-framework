@@ -4,7 +4,7 @@
 using System;
 using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Veldrid.Pipelines;
-using Veldrid;
+using NeoVeldrid;
 
 namespace osu.Framework.Graphics.Veldrid.Buffers
 {

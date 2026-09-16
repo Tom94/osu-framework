@@ -21,7 +21,7 @@ using osuTK;
 using osuTK.Graphics;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
-using Veldrid;
+using NeoVeldrid;
 using PrimitiveTopology = osu.Framework.Graphics.Rendering.PrimitiveTopology;
 
 namespace osu.Framework.Graphics.Veldrid
@@ -246,7 +246,7 @@ namespace osu.Framework.Graphics.Veldrid
         /// <param name="level">The texture level.</param>
         /// <param name="data">The texture data.</param>
         /// <typeparam name="T">The pixel type.</typeparam>
-        public void UpdateTexture<T>(global::Veldrid.Texture texture, int x, int y, int width, int height, int level, ReadOnlySpan<T> data)
+        public void UpdateTexture<T>(global::NeoVeldrid.Texture texture, int x, int y, int width, int height, int level, ReadOnlySpan<T> data)
             where T : unmanaged
         {
             ensureTextureUploadPipelineBegan();
@@ -264,7 +264,7 @@ namespace osu.Framework.Graphics.Veldrid
         /// <param name="level">The texture level.</param>
         /// <param name="data">The texture data.</param>
         /// <param name="rowLengthInBytes">The number of bytes per row of the image to read from <paramref name="data"/>.</param>
-        public void UpdateTexture(global::Veldrid.Texture texture, int x, int y, int width, int height, int level, IntPtr data, int rowLengthInBytes)
+        public void UpdateTexture(global::NeoVeldrid.Texture texture, int x, int y, int width, int height, int level, IntPtr data, int rowLengthInBytes)
             => bufferUpdatePipeline.UpdateTexture(stagingTexturePool, texture, x, y, width, height, level, data, rowLengthInBytes);
 
         protected override void SetUniformImplementation<T>(IUniformWithValue<T> uniform)
@@ -317,7 +317,7 @@ namespace osu.Framework.Graphics.Veldrid
 
         protected override INativeTexture CreateNativeTexture(int width, int height, bool manualMipmaps = false, TextureFilteringMode filteringMode = TextureFilteringMode.Linear,
                                                               Color4? initialisationColour = null)
-            => new VeldridTexture(this, width, height, PixelFormat.R8G8B8A8UNorm, manualMipmaps, filteringMode.ToSamplerFilter(), initialisationColour);
+            => new VeldridTexture(this, width, height, PixelFormat.R8_G8_B8_A8_UNorm, manualMipmaps, filteringMode.ToSamplerFilter(), initialisationColour);
 
         protected override INativeTexture CreateNativeVideoTexture(int width, int height)
             => new VeldridVideoTexture(this, width, height);
@@ -344,8 +344,6 @@ namespace osu.Framework.Graphics.Veldrid
                             return new PersistentStagingBuffer<T>(this, count);
 
                         default:
-                        // Metal uses a more optimal path that elides a Blit Command Encoder.
-                        case GraphicsBackend.Metal:
                         // OpenGL backends need additional work to support coherency and persistently mapped buffers.
                         case GraphicsBackend.OpenGL:
                         case GraphicsBackend.OpenGLES:

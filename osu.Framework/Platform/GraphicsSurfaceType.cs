@@ -17,12 +17,6 @@ namespace osu.Framework.Platform
         OpenGL,
 
         /// <summary>
-        /// A Metal graphics surface. The window must implement <see cref="IMetalGraphicsSurface"/>.
-        /// </summary>
-        [Description("Metal")]
-        Metal,
-
-        /// <summary>
         /// A Vulkan graphics surface.
         /// </summary>
         [Description("Vulkan")]

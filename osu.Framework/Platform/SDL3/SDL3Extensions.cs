@@ -914,7 +914,6 @@ namespace osu.Framework.Platform.SDL3
                 case GraphicsSurfaceType.Vulkan when !RuntimeInfo.IsApple:
                     return SDL_WindowFlags.SDL_WINDOW_VULKAN;
 
-                case GraphicsSurfaceType.Metal:
                 case GraphicsSurfaceType.Vulkan when RuntimeInfo.IsApple:
                     return SDL_WindowFlags.SDL_WINDOW_METAL;
             }

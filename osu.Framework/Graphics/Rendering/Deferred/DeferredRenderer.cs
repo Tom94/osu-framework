@@ -18,8 +18,8 @@ using osuTK;
 using osuTK.Graphics;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
-using Veldrid;
-using Texture = Veldrid.Texture;
+using NeoVeldrid;
+using Texture = NeoVeldrid.Texture;
 
 namespace osu.Framework.Graphics.Rendering.Deferred
 {
@@ -211,7 +211,7 @@ namespace osu.Framework.Graphics.Rendering.Deferred
 
         protected override INativeTexture CreateNativeTexture(int width, int height, bool manualMipmaps = false, TextureFilteringMode filteringMode = TextureFilteringMode.Linear,
                                                               Color4? initialisationColour = null)
-            => new VeldridTexture(this, width, height, PixelFormat.R8G8B8A8UNorm, manualMipmaps, filteringMode.ToSamplerFilter(), initialisationColour);
+            => new VeldridTexture(this, width, height, PixelFormat.R8_G8_B8_A8_UNorm, manualMipmaps, filteringMode.ToSamplerFilter(), initialisationColour);
 
         protected override INativeTexture CreateNativeVideoTexture(int width, int height)
             => new VeldridVideoTexture(this, width, height);

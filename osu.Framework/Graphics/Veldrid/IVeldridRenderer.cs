@@ -6,7 +6,7 @@ using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Veldrid.Shaders;
 using osu.Framework.Graphics.Veldrid.Textures;
 using osu.Framework.Platform;
-using Veldrid;
+using NeoVeldrid;
 
 namespace osu.Framework.Graphics.Veldrid
 {
@@ -61,9 +61,9 @@ namespace osu.Framework.Graphics.Veldrid
         void BindUniformBuffer(string blockName, IUniformBuffer buffer);
 
         /// <summary>
-        /// Updates a <see cref="global::Veldrid.Texture"/> with a <paramref name="data"/> at the specified coordinates.
+        /// Updates a <see cref="global::NeoVeldrid.Texture"/> with a <paramref name="data"/> at the specified coordinates.
         /// </summary>
-        /// <param name="texture">The <see cref="global::Veldrid.Texture"/> to update.</param>
+        /// <param name="texture">The <see cref="global::NeoVeldrid.Texture"/> to update.</param>
         /// <param name="x">The X coordinate of the update region.</param>
         /// <param name="y">The Y coordinate of the update region.</param>
         /// <param name="width">The width of the update region.</param>
@@ -74,9 +74,9 @@ namespace osu.Framework.Graphics.Veldrid
         void UpdateTexture<T>(Texture texture, int x, int y, int width, int height, int level, ReadOnlySpan<T> data) where T : unmanaged;
 
         /// <summary>
-        /// Updates a <see cref="global::Veldrid.Texture"/> with a <paramref name="data"/> at the specified coordinates.
+        /// Updates a <see cref="global::NeoVeldrid.Texture"/> with a <paramref name="data"/> at the specified coordinates.
         /// </summary>
-        /// <param name="texture">The <see cref="global::Veldrid.Texture"/> to update.</param>
+        /// <param name="texture">The <see cref="global::NeoVeldrid.Texture"/> to update.</param>
         /// <param name="x">The X coordinate of the update region.</param>
         /// <param name="y">The Y coordinate of the update region.</param>
         /// <param name="width">The width of the update region.</param>

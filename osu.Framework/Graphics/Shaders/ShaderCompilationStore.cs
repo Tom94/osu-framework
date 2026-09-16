@@ -9,8 +9,8 @@ using Newtonsoft.Json;
 using osu.Framework.Extensions;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
-using Veldrid;
-using Veldrid.SPIRV;
+using NeoVeldrid;
+using NeoVeldrid.SPIRV;
 
 namespace osu.Framework.Graphics.Shaders
 {

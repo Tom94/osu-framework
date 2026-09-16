@@ -6,13 +6,13 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using NeoVeldrid;
+using NeoVeldrid.SPIRV;
 using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Shaders;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Threading;
-using Veldrid;
-using Veldrid.SPIRV;
 using static osu.Framework.Threading.ScheduledDelegate;
 
 namespace osu.Framework.Graphics.Veldrid.Shaders
@@ -115,12 +115,12 @@ namespace osu.Framework.Graphics.Veldrid.Shaders
                 vertexShaderDescription = new ShaderDescription(
                     ShaderStages.Vertex,
                     Array.Empty<byte>(),
-                    renderer.Factory.BackendType == GraphicsBackend.Metal ? "main0" : "main");
+                    "main");
 
                 fragmentShaderDescription = new ShaderDescription(
                     ShaderStages.Fragment,
                     Array.Empty<byte>(),
-                    renderer.Factory.BackendType == GraphicsBackend.Metal ? "main0" : "main");
+                    "main");
 
                 // GLSL cross compile is always performed for reflection, even though the cross-compiled shaders aren't used under other backends.
                 VertexFragmentShaderCompilation compilation = compilationStore.CompileVertexFragment(
@@ -144,7 +144,6 @@ namespace osu.Framework.Graphics.Veldrid.Shaders
                     {
                         CrossCompileTarget target = renderer.SurfaceType switch
                         {
-                            GraphicsSurfaceType.Metal => CrossCompileTarget.MSL,
                             GraphicsSurfaceType.Direct3D11 => CrossCompileTarget.HLSL,
                             _ => throw new InvalidOperationException($"Unsupported surface type: {renderer.SurfaceType}.")
                         };

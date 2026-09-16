@@ -16,9 +16,9 @@ using osu.Framework.Platform;
 using osuTK.Graphics;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
-using Veldrid;
-using PixelFormat = Veldrid.PixelFormat;
-using Texture = Veldrid.Texture;
+using NeoVeldrid;
+using PixelFormat = NeoVeldrid.PixelFormat;
+using Texture = NeoVeldrid.Texture;
 
 namespace osu.Framework.Graphics.Veldrid.Textures
 {
@@ -87,7 +87,7 @@ namespace osu.Framework.Graphics.Veldrid.Textures
         /// <param name="manualMipmaps">Whether manual mipmaps will be uploaded to the texture. If false, the texture will compute mipmaps automatically.</param>
         /// <param name="filteringMode">The filtering mode.</param>
         /// <param name="initialisationColour">The colour to initialise texture levels with (in the case of sub region initial uploads). If null, no initialisation is provided out-of-the-box.</param>
-        public VeldridTexture(IVeldridRenderer renderer, int width, int height, PixelFormat textureFormat = PixelFormat.R8G8B8A8UNorm, bool manualMipmaps = false, SamplerFilter filteringMode = SamplerFilter.MinLinearMagLinearMipLinear,
+        public VeldridTexture(IVeldridRenderer renderer, int width, int height, PixelFormat textureFormat = PixelFormat.R8_G8_B8_A8_UNorm, bool manualMipmaps = false, SamplerFilter filteringMode = SamplerFilter.MinLinear_MagLinear_MipLinear,
                               Color4? initialisationColour = null)
         {
             this.manualMipmaps = manualMipmaps;

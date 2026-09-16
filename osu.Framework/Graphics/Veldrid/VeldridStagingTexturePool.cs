@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics.Veldrid.Pipelines;
-using Veldrid;
+using NeoVeldrid;
 
 namespace osu.Framework.Graphics.Veldrid
 {

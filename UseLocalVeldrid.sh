@@ -8,21 +8,19 @@
 FRAMEWORK_CSPROJ="osu.Framework/osu.Framework.csproj"
 SLN="osu-framework.sln"
 
-dotnet remove $FRAMEWORK_CSPROJ reference ppy.Veldrid
+dotnet remove $FRAMEWORK_CSPROJ reference ppy.Veldrid ppy.Veldrid.SPIRV
 
-dotnet sln $SLN add ../veldrid/src/Veldrid/Veldrid.csproj \
-    ../veldrid/src/Veldrid.MetalBindings/Veldrid.MetalBindings.csproj \
-    ../veldrid/src/Veldrid.OpenGLBindings/Veldrid.OpenGLBindings.csproj
+dotnet sln $SLN add ../neo-veldrid/src/NeoVeldrid/NeoVeldrid.csproj ../neo-veldrid/src/NeoVeldrid.SPIRV/NeoVeldrid.SPIRV.csproj
 
-dotnet add $FRAMEWORK_CSPROJ reference ../veldrid/src/Veldrid/Veldrid.csproj
+dotnet add $FRAMEWORK_CSPROJ reference ../neo-veldrid/src/NeoVeldrid/NeoVeldrid.csproj ../neo-veldrid/src/NeoVeldrid.SPIRV/NeoVeldrid.SPIRV.csproj
 
 tmp=$(mktemp)
 
-jq '.solution.projects += ["../veldrid/src/Veldrid/Veldrid.csproj", "../veldrid/src/Veldrid.MetalBindings/Veldrid.MetalBindings.csproj", "../veldrid/src/Veldrid.OpenGLBindings/Veldrid.OpenGLBindings.csproj"]' osu-framework.Desktop.slnf > $tmp
+jq '.solution.projects += ["../neo-veldrid/src/NeoVeldrid/NeoVeldrid.csproj", "../neo-veldrid/src/NeoVeldrid.SPIRV/NeoVeldrid.SPIRV.csproj"]' osu-framework.Desktop.slnf > $tmp
 mv -f $tmp osu-framework.Desktop.slnf
 
-jq '.solution.projects += ["../veldrid/src/Veldrid/Veldrid.csproj", "../veldrid/src/Veldrid.MetalBindings/Veldrid.MetalBindings.csproj", "../veldrid/src/Veldrid.OpenGLBindings/Veldrid.OpenGLBindings.csproj"]' osu-framework.Android.slnf > $tmp
+jq '.solution.projects += ["../neo-veldrid/src/NeoVeldrid/NeoVeldrid.csproj", "../neo-veldrid/src/NeoVeldrid.SPIRV/NeoVeldrid.SPIRV.csproj"]' osu-framework.Android.slnf > $tmp
 mv -f $tmp osu-framework.Android.slnf
 
-jq '.solution.projects += ["../veldrid/src/Veldrid/Veldrid.csproj", "../veldrid/src/Veldrid.MetalBindings/Veldrid.MetalBindings.csproj", "../veldrid/src/Veldrid.OpenGLBindings/Veldrid.OpenGLBindings.csproj"]' osu-framework.iOS.slnf > $tmp
+jq '.solution.projects += ["../neo-veldrid/src/NeoVeldrid/NeoVeldrid.csproj", "../neo-veldrid/src/NeoVeldrid.SPIRV/NeoVeldrid.SPIRV.csproj"]' osu-framework.iOS.slnf > $tmp
 mv -f $tmp osu-framework.iOS.slnf

@@ -9,7 +9,7 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using osu.Framework.Graphics.Rendering.Vertices;
-using Veldrid;
+using NeoVeldrid;
 
 namespace osu.Framework.Graphics.Veldrid.Vertices
 {

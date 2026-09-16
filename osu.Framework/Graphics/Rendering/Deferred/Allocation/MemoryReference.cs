@@ -3,7 +3,7 @@
 
 using System;
 using osu.Framework.Development;
-using Veldrid;
+using NeoVeldrid;
 
 namespace osu.Framework.Graphics.Rendering.Deferred.Allocation
 {

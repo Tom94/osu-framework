@@ -859,16 +859,14 @@ namespace osu.Framework.Platform
                     break;
 
                 case RuntimeInfo.Platform.macOS:
-                    yield return RendererType.Metal;
-                    yield return RendererType.Deferred_Metal;
+                    yield return RendererType.Deferred_Vulkan;
                     yield return RendererType.OpenGL;
 
                     break;
 
                 case RuntimeInfo.Platform.iOS:
                     // GL renderer not supported, see: https://github.com/ppy/osu/issues/23003.
-                    yield return RendererType.Metal;
-                    yield return RendererType.Deferred_Metal;
+                    yield return RendererType.Deferred_Vulkan;
 
                     break;
 
@@ -921,7 +919,6 @@ namespace osu.Framework.Platform
                             SetupRendererAndWindow(CreateGLRenderer(), GraphicsSurfaceType.OpenGL);
                             break;
 
-                        case RendererType.Deferred_Metal:
                         case RendererType.Deferred_Vulkan:
                         case RendererType.Deferred_Direct3D11:
                         case RendererType.Deferred_OpenGL:
@@ -957,11 +954,6 @@ namespace osu.Framework.Platform
 
             switch (renderer)
             {
-                case RendererType.Deferred_Metal:
-                case RendererType.Metal:
-                    surface = GraphicsSurfaceType.Metal;
-                    break;
-
                 case RendererType.Deferred_Vulkan:
                 case RendererType.Vulkan:
                     surface = GraphicsSurfaceType.Vulkan;
@@ -1054,7 +1046,8 @@ namespace osu.Framework.Platform
                 {
                     Rectangle bounds = display.NewValue.Bounds;
 
-                    veldridRenderer.Device.UpdateActiveDisplay(bounds.X, bounds.Y, bounds.Width, bounds.Height);
+                    // TODO: restore
+                    // veldridRenderer.Device.UpdateActiveDisplay(bounds.X, bounds.Y, bounds.Width, bounds.Height);
                 }
             }, true);
 

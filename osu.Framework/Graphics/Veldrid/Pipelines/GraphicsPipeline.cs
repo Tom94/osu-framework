@@ -9,7 +9,7 @@ using osu.Framework.Graphics.Veldrid.Buffers;
 using osu.Framework.Graphics.Veldrid.Shaders;
 using osu.Framework.Graphics.Veldrid.Textures;
 using osu.Framework.Statistics;
-using Veldrid;
+using NeoVeldrid;
 
 namespace osu.Framework.Graphics.Veldrid.Pipelines
 {
@@ -27,8 +27,8 @@ namespace osu.Framework.Graphics.Veldrid.Pipelines
 
         private GraphicsPipelineDescription pipelineDesc = new GraphicsPipelineDescription
         {
-            RasterizerState = RasterizerStateDescription.CULL_NONE,
-            BlendState = BlendStateDescription.SINGLE_OVERRIDE_BLEND,
+            RasterizerState = RasterizerStateDescription.CullNone,
+            BlendState = BlendStateDescription.SingleOverrideBlend,
             ShaderSet = { VertexLayouts = new VertexLayoutDescription[1] }
         };
 
@@ -241,7 +241,7 @@ namespace osu.Framework.Graphics.Veldrid.Pipelines
         /// </list>
         /// </remarks>
         /// <exception cref="InvalidOperationException">If no shader or index buffer is active.</exception>
-        public void DrawVertices(global::Veldrid.PrimitiveTopology topology, int vertexStart, int verticesCount, int vertexIndexOffset = 0)
+        public void DrawVertices(global::NeoVeldrid.PrimitiveTopology topology, int vertexStart, int verticesCount, int vertexIndexOffset = 0)
         {
             if (currentShader == null)
                 throw new InvalidOperationException("No shader bound.");

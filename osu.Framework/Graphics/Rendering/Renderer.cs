@@ -170,10 +170,6 @@ namespace osu.Framework.Graphics.Rendering
                 case GraphicsSurfaceType.OpenGL:
                     Trace.Assert(graphicsSurface is IOpenGLGraphicsSurface, $"Window must implement {nameof(IOpenGLGraphicsSurface)}.");
                     break;
-
-                case GraphicsSurfaceType.Metal:
-                    Trace.Assert(graphicsSurface is IMetalGraphicsSurface, $"Window graphics API must implement {nameof(IMetalGraphicsSurface)}.");
-                    break;
             }
 
             Initialise(graphicsSurface);

@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using osu.Framework.Utils;
-using Veldrid;
+using NeoVeldrid;
 
 namespace osu.Framework.Graphics.Rendering.Deferred.Allocation
 {

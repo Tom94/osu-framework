@@ -5,7 +5,7 @@ using System;
 using System.Buffers;
 using System.Runtime.CompilerServices;
 using SixLabors.ImageSharp.Memory;
-using Veldrid;
+using NeoVeldrid;
 
 namespace osu.Framework.Graphics.Veldrid.Buffers.Staging
 {

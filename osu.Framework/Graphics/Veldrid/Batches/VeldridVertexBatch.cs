@@ -95,9 +95,7 @@ namespace osu.Framework.Graphics.Veldrid.Batches
 
         protected IVeldridVertexBuffer<T> CreateVertexBuffer(VeldridRenderer renderer)
         {
-            return renderer.SurfaceType == GraphicsSurfaceType.Metal
-                ? new VeldridMetalVertexBuffer<T>(renderer, Size)
-                : new VeldridVertexBuffer<T>(renderer, Size);
+            return new VeldridVertexBuffer<T>(renderer, Size);
         }
 
         /// <summary>

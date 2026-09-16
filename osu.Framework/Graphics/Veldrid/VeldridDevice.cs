@@ -5,16 +5,18 @@ using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Threading;
+using NeoVeldrid;
+using NeoVeldrid.OpenGL;
 using osu.Framework.Development;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
+using Silk.NET.OpenGL;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
-using Veldrid;
-using Veldrid.OpenGL;
-using Veldrid.OpenGLBindings;
+using PixelFormat = NeoVeldrid.PixelFormat;
+using Texture = NeoVeldrid.Texture;
 
 namespace osu.Framework.Graphics.Veldrid
 {
@@ -54,8 +56,9 @@ namespace osu.Framework.Graphics.Veldrid
         /// </summary>
         public bool AllowTearing
         {
-            get => Device.AllowTearing;
-            set => Device.AllowTearing = value;
+            // TODO: restore
+            get;
+            set;
         }
 
         /// <summary>
@@ -106,7 +109,7 @@ namespace osu.Framework.Graphics.Veldrid
             var options = new GraphicsDeviceOptions
             {
                 HasMainSwapchain = true,
-                SwapchainDepthFormat = PixelFormat.R16UNorm,
+                SwapchainDepthFormat = PixelFormat.R16_UNorm,
                 SyncToVerticalBlank = true,
                 ResourceBindingModel = ResourceBindingModel.Improved,
             };
@@ -134,26 +137,28 @@ namespace osu.Framework.Graphics.Veldrid
 
                 case RuntimeInfo.Platform.macOS:
                 {
+                    // TODO: implement moltenvk
                     // OpenGL doesn't use a swapchain, so it's only needed on Metal.
                     // Creating a Metal surface in general would otherwise destroy the GL context.
-                    if (this.graphicsSurface.Type == GraphicsSurfaceType.Metal)
-                    {
-                        var metalGraphics = (IMetalGraphicsSurface)this.graphicsSurface;
-                        swapchain.Source = SwapchainSource.CreateNSView(metalGraphics.CreateMetalView());
-                    }
+                    // if (this.graphicsSurface.Type == GraphicsSurfaceType.Metal)
+                    // {
+                    //     var metalGraphics = (IMetalGraphicsSurface)this.graphicsSurface;
+                    //     swapchain.Source = SwapchainSource.CreateNSView(metalGraphics.CreateMetalView());
+                    // }
 
                     break;
                 }
 
                 case RuntimeInfo.Platform.iOS:
                 {
+                    // TODO: implement moltenvk
                     // OpenGL doesn't use a swapchain, so it's only needed on Metal.
                     // Creating a Metal surface in general would otherwise destroy the GL context.
-                    if (this.graphicsSurface.Type == GraphicsSurfaceType.Metal)
-                    {
-                        var metalGraphics = (IMetalGraphicsSurface)this.graphicsSurface;
-                        swapchain.Source = SwapchainSource.CreateUIView(metalGraphics.CreateMetalView());
-                    }
+                    // if (this.graphicsSurface.Type == GraphicsSurfaceType.Metal)
+                    // {
+                    //     var metalGraphics = (IMetalGraphicsSurface)this.graphicsSurface;
+                    //     // swapchain.Source = SwapchainSource.CreateUIView(metalGraphics.CreateMetalView());
+                    // }
 
                     break;
                 }
@@ -170,7 +175,8 @@ namespace osu.Framework.Graphics.Veldrid
                 case RuntimeInfo.Platform.Android:
                 {
                     var androidGraphics = (IAndroidGraphicsSurface)this.graphicsSurface;
-                    swapchain.Source = SwapchainSource.CreateAndroidSurface(androidGraphics.SurfaceHandle, androidGraphics.JniEnvHandle);
+                    // TODO: restore
+                    // swapchain.Source = SwapchainSource.CreateAndroidSurface(androidGraphics.SurfaceHandle, androidGraphics.JniEnvHandle);
                     break;
                 }
             }
@@ -179,6 +185,7 @@ namespace osu.Framework.Graphics.Veldrid
             {
                 case GraphicsSurfaceType.OpenGL:
                     var openGLGraphics = (IOpenGLGraphicsSurface)this.graphicsSurface;
+                    var gl = GL.GetApi(openGLGraphics.GetProcAddress);
                     var openGLInfo = new OpenGLPlatformInfo(
                         openGLContextHandle: openGLGraphics.WindowContext,
                         getProcAddress: openGLGraphics.GetProcAddress,
@@ -188,11 +195,11 @@ namespace osu.Framework.Graphics.Veldrid
                         deleteContext: openGLGraphics.DeleteContext,
                         swapBuffers: openGLGraphics.SwapBuffers,
                         setSyncToVerticalBlank: v => openGLGraphics.VerticalSync = v,
-                        setSwapchainFramebuffer: () => OpenGLNative.glBindFramebuffer(FramebufferTarget.Framebuffer, (uint)(openGLGraphics.BackbufferFramebuffer ?? 0)),
+                        setSwapchainFramebuffer: () => gl.BindFramebuffer(FramebufferTarget.Framebuffer, (uint)(openGLGraphics.BackbufferFramebuffer ?? 0)),
                         null);
 
                     Device = GraphicsDevice.CreateOpenGL(options, openGLInfo, swapchain.Width, swapchain.Height);
-                    Device.LogOpenGL(out maxTextureSize);
+                    Device.LogOpenGL(gl, out maxTextureSize);
                     break;
 
                 case GraphicsSurfaceType.Vulkan:
@@ -203,11 +210,6 @@ namespace osu.Framework.Graphics.Veldrid
                 case GraphicsSurfaceType.Direct3D11:
                     Device = GraphicsDevice.CreateD3D11(options, swapchain);
                     Device.LogD3D11(out maxTextureSize);
-                    break;
-
-                case GraphicsSurfaceType.Metal:
-                    Device = GraphicsDevice.CreateMetal(options, swapchain);
-                    Device.LogMetal(out maxTextureSize);
                     break;
 
                 default:
@@ -251,7 +253,9 @@ namespace osu.Framework.Graphics.Veldrid
         /// Waits until the GPU signals that the next frame is ready to be rendered.
         /// </summary>
         public void WaitUntilNextFrameReady()
-            => Device.WaitForNextFrameReady();
+        {
+            // TODO: restore
+        }
 
         /// <summary>
         /// Invoked when the rendering thread is active and commands will be enqueued.
@@ -293,13 +297,14 @@ namespace osu.Framework.Graphics.Veldrid
                 case GraphicsSurfaceType.OpenGL:
                 {
                     var pixelData = SixLabors.ImageSharp.Configuration.Default.MemoryAllocator.Allocate<Rgba32>((int)(texture.Width * texture.Height));
+                    var gl = GL.GetApi(((IOpenGLGraphicsSurface)graphicsSurface).GetProcAddress);
 
                     var info = Device.GetOpenGLInfo();
 
                     info.ExecuteOnGLThread(() =>
                     {
                         fixed (Rgba32* data = pixelData.Memory.Span)
-                            OpenGLNative.glReadPixels(0, 0, texture.Width, texture.Height, GLPixelFormat.Rgba, GLPixelType.UnsignedByte, data);
+                            gl.ReadPixels(0, 0, texture.Width, texture.Height, Silk.NET.OpenGL.PixelFormat.Rgba, PixelType.UnsignedByte, data);
                     });
 
                     var glImage = Image.LoadPixelData(pixelData.Memory.Span, (int)texture.Width, (int)texture.Height);
@@ -361,18 +366,6 @@ namespace osu.Framework.Graphics.Veldrid
         /// <returns>Whether the fence was signalled.</returns>
         private bool waitForFence(Fence fence, int millisecondsTimeout)
         {
-            // todo: Metal doesn't support WaitForFence due to lack of implementation and bugs with supporting MTLSharedEvent.notifyListener,
-            // until that is fixed in some way or another, poll on the signal state.
-            if (graphicsSurface.Type == GraphicsSurfaceType.Metal)
-            {
-                const int sleep_time = 10;
-
-                while (!fence.Signaled && (millisecondsTimeout -= sleep_time) > 0)
-                    Thread.Sleep(sleep_time);
-
-                return fence.Signaled;
-            }
-
             return Device.WaitForFence(fence, (ulong)(millisecondsTimeout * 1_000_000));
         }
     }

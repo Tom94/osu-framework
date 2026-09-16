@@ -10,8 +10,8 @@ using osu.Framework.Graphics.Veldrid.Buffers.Staging;
 using osu.Framework.Graphics.Veldrid.Vertices;
 using osu.Framework.Platform;
 using osu.Framework.Statistics;
-using Veldrid;
-using BufferUsage = Veldrid.BufferUsage;
+using NeoVeldrid;
+using BufferUsage = NeoVeldrid.BufferUsage;
 
 namespace osu.Framework.Graphics.Veldrid.Buffers
 {

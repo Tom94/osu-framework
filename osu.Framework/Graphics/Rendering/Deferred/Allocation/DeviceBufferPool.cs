@@ -4,7 +4,7 @@
 using osu.Framework.Graphics.Veldrid;
 using osu.Framework.Graphics.Veldrid.Pipelines;
 using osu.Framework.Statistics;
-using Veldrid;
+using NeoVeldrid;
 
 namespace osu.Framework.Graphics.Rendering.Deferred.Allocation
 {

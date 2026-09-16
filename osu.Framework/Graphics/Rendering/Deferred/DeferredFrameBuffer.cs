@@ -9,7 +9,7 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.Graphics.Veldrid.Buffers;
 using osu.Framework.Graphics.Veldrid.Textures;
 using osuTK;
-using Veldrid;
+using NeoVeldrid;
 using Texture = osu.Framework.Graphics.Textures.Texture;
 
 namespace osu.Framework.Graphics.Rendering.Deferred
@@ -94,7 +94,7 @@ namespace osu.Framework.Graphics.Rendering.Deferred
             private readonly DeferredFrameBuffer deferredFrameBuffer;
             private readonly VeldridTextureResources?[] resourcesArray = new VeldridTextureResources?[1];
 
-            private global::Veldrid.Texture? depthTexture;
+            private global::NeoVeldrid.Texture? depthTexture;
             private Framebuffer? framebuffer;
 
             private Vector2I resourceSize = Vector2I.One;

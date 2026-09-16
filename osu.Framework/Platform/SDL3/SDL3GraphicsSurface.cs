@@ -42,7 +42,6 @@ namespace osu.Framework.Platform.SDL3
                     break;
 
                 case GraphicsSurfaceType.Vulkan:
-                case GraphicsSurfaceType.Metal:
                 case GraphicsSurfaceType.Direct3D11:
                     break;
 

@@ -10,7 +10,7 @@ using osu.Framework.Graphics.Veldrid.Buffers;
 using osu.Framework.Graphics.Veldrid.Vertices;
 using osu.Framework.Statistics;
 using osu.Framework.Utils;
-using Veldrid;
+using NeoVeldrid;
 
 namespace osu.Framework.Graphics.Rendering.Deferred.Allocation
 {

@@ -3,7 +3,7 @@
 
 using System;
 using System.Runtime.CompilerServices;
-using Veldrid;
+using NeoVeldrid;
 
 namespace osu.Framework.Graphics.Veldrid.Buffers.Staging
 {
