@@ -24,6 +24,7 @@ namespace osu.Framework.Testing
         public TestBrowserTestRunner(TestBrowser browser)
         {
             this.browser = browser;
+            this.browser.RunAllSteps.Value = true;
         }
 
         [BackgroundDependencyLoader]
@@ -64,6 +65,8 @@ namespace osu.Framework.Testing
         {
             if (loadableTestType == null)
             {
+                Logger.Log($@"Finished running all tests.");
+
                 //we're done
                 Scheduler.AddDelayed(host.Exit, time_between_tests);
                 return;
@@ -71,8 +74,12 @@ namespace osu.Framework.Testing
 
             if (browser.CurrentTest?.GetType() != loadableTestType)
             {
+                Logger.Log($@"Loading test #{testIndex} ({loadableTestType})...");
+
                 browser.LoadTest(loadableTestType, () =>
                 {
+                    Logger.Log($@"Finished loading test #{testIndex} ({loadableTestType}). Scheduling next test in {time_between_tests}ms...");
+
                     testIndex++;
                     Scheduler.AddDelayed(runNext, time_between_tests);
                 });
