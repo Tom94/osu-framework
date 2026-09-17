@@ -27,6 +27,7 @@ using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 using GL4 = osuTK.Graphics.OpenGL;
 using Image = SixLabors.ImageSharp.Image;
+using LowLatencyMode = Veldrid.LowLatencyMode;
 
 namespace osu.Framework.Graphics.OpenGL
 {
@@ -41,6 +42,16 @@ namespace osu.Framework.Graphics.OpenGL
         }
 
         protected internal override bool AllowTearing { get; set; }
+
+        protected internal override bool LowLatencySupported => false;
+
+        protected internal override LowLatencyMode LowLatencyMode
+        {
+            get => LowLatencyMode.Off;
+            set { }
+        }
+
+        protected internal override uint LowLatencyMinimumIntervalUs { get; set; }
 
         public override bool IsDepthRangeZeroToOne => false;
         public override bool IsUvOriginTopLeft => false;

@@ -10,13 +10,13 @@ using osu.Framework.Graphics.Rendering.Vertices;
 using osu.Framework.Graphics.Shaders;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Graphics.Veldrid.Batches;
-using osu.Framework.Platform;
 using osu.Framework.Graphics.Veldrid.Buffers;
 using osu.Framework.Graphics.Veldrid.Buffers.Staging;
 using osu.Framework.Graphics.Veldrid.Pipelines;
 using osu.Framework.Graphics.Veldrid.Shaders;
 using osu.Framework.Graphics.Veldrid.Textures;
 using osu.Framework.Graphics.Veldrid.Vertices;
+using osu.Framework.Platform;
 using osuTK;
 using osuTK.Graphics;
 using SixLabors.ImageSharp;
@@ -38,6 +38,21 @@ namespace osu.Framework.Graphics.Veldrid
         {
             get => veldridDevice.AllowTearing;
             set => veldridDevice.AllowTearing = value;
+        }
+
+        protected internal override bool LowLatencySupported
+            => veldridDevice.LowLatencySupported;
+
+        protected internal override LowLatencyMode LowLatencyMode
+        {
+            get => veldridDevice.LowLatencyMode;
+            set => veldridDevice.LowLatencyMode = value;
+        }
+
+        protected internal override uint LowLatencyMinimumIntervalUs
+        {
+            get => veldridDevice.LowLatencyMinimumIntervalUs;
+            set => veldridDevice.LowLatencyMinimumIntervalUs = value;
         }
 
         public override bool IsDepthRangeZeroToOne

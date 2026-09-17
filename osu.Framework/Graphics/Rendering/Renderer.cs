@@ -25,6 +25,7 @@ using osuTK;
 using osuTK.Graphics;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
+using LowLatencyMode = Veldrid.LowLatencyMode;
 using RectangleF = osu.Framework.Graphics.Primitives.RectangleF;
 using Texture = osu.Framework.Graphics.Textures.Texture;
 
@@ -42,6 +43,9 @@ namespace osu.Framework.Graphics.Rendering
 
         protected internal abstract bool VerticalSync { get; set; }
         protected internal abstract bool AllowTearing { get; set; }
+        protected internal abstract bool LowLatencySupported { get; }
+        protected internal abstract LowLatencyMode LowLatencyMode { get; set; }
+        protected internal abstract uint LowLatencyMinimumIntervalUs { get; set; }
 
         protected internal Storage? CacheStorage
         {
@@ -1204,6 +1208,20 @@ namespace osu.Framework.Graphics.Rendering
         {
             get => AllowTearing;
             set => AllowTearing = value;
+        }
+
+        bool IRenderer.LowLatencySupported => LowLatencySupported;
+
+        LowLatencyMode IRenderer.LowLatencyMode
+        {
+            get => LowLatencyMode;
+            set => LowLatencyMode = value;
+        }
+
+        uint IRenderer.LowLatencyMinimumIntervalUs
+        {
+            get => LowLatencyMinimumIntervalUs;
+            set => LowLatencyMinimumIntervalUs = value;
         }
 
         Storage? IRenderer.CacheStorage
