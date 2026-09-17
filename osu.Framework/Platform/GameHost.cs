@@ -502,7 +502,7 @@ namespace osu.Framework.Platform
             if (Window.WindowState == WindowState.Minimised)
                 return;
 
-            Renderer.AllowTearing = windowMode.Value == WindowMode.Fullscreen;
+            Renderer.AllowTearing = windowMode.Value == WindowMode.Fullscreen && frameSyncMode.Value != FrameSync.VSync;
 
             TripleBuffer<DrawNode>.Buffer buffer;
 
