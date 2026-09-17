@@ -16,7 +16,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
-using osuTK;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Configuration;
@@ -30,21 +29,23 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.OpenGL;
 using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Rendering.Deferred;
+using osu.Framework.Graphics.Textures;
+using osu.Framework.Graphics.Veldrid;
+using osu.Framework.Graphics.Video;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Handlers;
+using osu.Framework.IO.Serialization;
+using osu.Framework.IO.Stores;
+using osu.Framework.Localisation;
 using osu.Framework.Logging;
 using osu.Framework.Statistics;
 using osu.Framework.Threading;
 using osu.Framework.Timing;
+using osuTK;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
-using osu.Framework.Graphics.Textures;
-using osu.Framework.Graphics.Veldrid;
-using osu.Framework.Graphics.Video;
-using osu.Framework.IO.Serialization;
-using osu.Framework.IO.Stores;
-using osu.Framework.Localisation;
+using LowLatencyMode = Veldrid.LowLatencyMode;
 using Rectangle = System.Drawing.Rectangle;
 using Size = System.Drawing.Size;
 
@@ -501,8 +502,6 @@ namespace osu.Framework.Platform
 
             if (Window.WindowState == WindowState.Minimised)
                 return;
-
-            Renderer.AllowTearing = windowMode.Value == WindowMode.Fullscreen && frameSyncMode.Value != FrameSync.VSync;
 
             TripleBuffer<DrawNode>.Buffer buffer;
 
@@ -1046,7 +1045,7 @@ namespace osu.Framework.Platform
             }
 
             currentDisplayMode = Window.CurrentDisplayMode.GetBoundCopy();
-            currentDisplayMode.BindValueChanged(_ => updateFrameSyncMode());
+            currentDisplayMode.BindValueChanged(_ => updateFramePacing());
 
             Window.CurrentDisplayBindable.BindValueChanged(display =>
             {
@@ -1211,6 +1210,10 @@ namespace osu.Framework.Platform
 
         private Bindable<FrameSync> frameSyncMode;
 
+        private Bindable<LowLatency> lowLatencyMode;
+
+        private Bindable<double> maxFps;
+
         private IBindable<DisplayMode> currentDisplayMode;
 
         private Bindable<string> ignoredInputHandlers;
@@ -1244,10 +1247,20 @@ namespace osu.Framework.Platform
             }, true);
 
             executionMode = Config.GetBindable<ExecutionMode>(FrameworkSetting.ExecutionMode);
-            executionMode.BindValueChanged(e => threadRunner.ExecutionMode = e.NewValue, true);
+            executionMode.BindValueChanged(e =>
+            {
+                threadRunner.ExecutionMode = e.NewValue;
+                updateFramePacing();
+            }, true);
 
             frameSyncMode = Config.GetBindable<FrameSync>(FrameworkSetting.FrameSync);
-            frameSyncMode.ValueChanged += _ => updateFrameSyncMode();
+            frameSyncMode.ValueChanged += _ => updateFramePacing();
+
+            lowLatencyMode = Config.GetBindable<LowLatency>(FrameworkSetting.LowLatency);
+            lowLatencyMode.ValueChanged += _ => updateFramePacing();
+
+            maxFps = Config.GetBindable<double>(FrameworkSetting.MaxFps);
+            maxFps.ValueChanged += _ => updateFramePacing();
 
 #pragma warning disable 618
             // pragma region can be removed 20210911
@@ -1320,48 +1333,38 @@ namespace osu.Framework.Platform
         /// </summary>
         private const int maximum_sane_fps = GameThread.DEFAULT_ACTIVE_HZ;
 
-        private void updateFrameSyncMode()
+        private void updateFramePacing()
         {
             if (Window == null)
                 return;
 
-            int refreshRate = (int)MathF.Round(Window.CurrentDisplayMode.Value.RefreshRate);
+            if (!Renderer.LowLatencySupported)
+                lowLatencyMode.Value = LowLatency.Off;
+
+            double refreshRate = Window.CurrentDisplayMode.Value.RefreshRate;
 
             // For invalid refresh rates let's assume 60 Hz as it is most common.
             if (refreshRate <= 0)
                 refreshRate = 60;
 
-            int drawLimiter = refreshRate;
-            int updateLimiter = drawLimiter * 2;
+            if (maxFps.Value <= 0)
+                maxFps.Value = maximum_sane_fps;
 
-            setVSyncMode();
+            var fsm = frameSyncMode.Value;
+            bool lowLatencyOn = lowLatencyMode.Value != LowLatency.Off;
+            double drawLimiter = maxFps.Value;
 
-            switch (frameSyncMode.Value)
+            // Run updates at max fps to reduce input latency. If energy savings are desired, rather than limiting a separate update thread's
+            // frequency, it's better to switch to single-threaded execution mode which will tie updates to the draw thread's frequency.
+            double updateLimiter = Math.Max(maxFps.Value, maximum_sane_fps);
+
+            // If VRR is enabled, cap FPS slightly *below* the refresh rate to avoid the FIFO filling up which would cause significant
+            // latency. Note that this optimization is *only* possible on VRR displays, hence gated after the VRR setting, because it
+            // would cause periodic stutters on fixed refresh rate displays.
+            if (fsm == FrameSync.VSyncVRR)
             {
-                case FrameSync.VSync:
-                    drawLimiter = int.MaxValue;
-                    updateLimiter *= 2;
-                    break;
-
-                case FrameSync.Limit2x:
-                    drawLimiter *= 2;
-                    updateLimiter *= 2;
-                    break;
-
-                case FrameSync.Limit4x:
-                    drawLimiter *= 4;
-                    updateLimiter *= 4;
-                    break;
-
-                case FrameSync.Limit8x:
-                    drawLimiter *= 8;
-                    updateLimiter *= 8;
-                    break;
-
-                case FrameSync.Unlimited:
-                    drawLimiter = int.MaxValue;
-                    updateLimiter = int.MaxValue;
-                    break;
+                double vrrCap = Math.Min(refreshRate * 0.985, Math.Max(refreshRate - 2, 0));
+                drawLimiter = Math.Min(vrrCap, drawLimiter);
             }
 
             if (!AllowBenchmarkUnlimitedFrames)
@@ -1370,15 +1373,32 @@ namespace osu.Framework.Platform
                 updateLimiter = Math.Min(maximum_sane_fps, updateLimiter);
             }
 
-            MaximumDrawHz = drawLimiter;
-            MaximumUpdateHz = updateLimiter;
-        }
+            // Framework-side limiting imposed by the draw thread in addition to any vsync or low latency related limiting by the driver.
+            double drawThreadLimiter = drawLimiter;
 
-        private void setVSyncMode()
-        {
+            // If we're running vsync at the screen's refresh rate, don't impose a cap of our own. Trust the driver to schedule things
+            // more optimally then we can. Similarly, if we're running in low latency mode, the low latency framework will take care of
+            // limiting the draw rate.
+            if (fsm != FrameSync.Off && drawLimiter >= refreshRate || lowLatencyOn)
+                drawThreadLimiter = Math.Max(maximum_sane_fps, drawThreadLimiter);
+
+            MaximumDrawHz = drawThreadLimiter;
+            MaximumUpdateHz = executionMode.Value == ExecutionMode.SingleThread ? drawThreadLimiter : updateLimiter;
+
             if (Window == null) return;
 
-            DrawThread.Scheduler.Add(() => Renderer.VerticalSync = frameSyncMode.Value == FrameSync.VSync);
+            DrawThread.Scheduler.Add(() =>
+            {
+                Renderer.AllowTearing = frameSyncMode.Value == FrameSync.Off;
+                Renderer.VerticalSync = frameSyncMode.Value != FrameSync.Off;
+                Renderer.LowLatencyMode = lowLatencyMode.Value switch
+                {
+                    LowLatency.On => LowLatencyMode.On,
+                    LowLatency.OnWithBoost => LowLatencyMode.OnWithBoost,
+                    _ => LowLatencyMode.Off,
+                };
+                Renderer.LowLatencyMinimumIntervalUs = drawLimiter > 0 ? (uint)Math.Ceiling(1_000_000 / drawLimiter) : 0;
+            });
         }
 
         /// <summary>

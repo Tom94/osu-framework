@@ -8,13 +8,13 @@ namespace osu.Framework.Configuration
 {
     // todo: revisit when we have a way to exclude enum members from naming rules
     [SuppressMessage("ReSharper", "InconsistentNaming")]
-    public enum FrameSync
+    public enum LowLatency
     {
-        VSync,
-
-        [Description("VSync (VRR low latency)")]
-        VSyncVRR,
-
         Off,
+
+        On,
+
+        [Description("On with boost")]
+        OnWithBoost,
     }
 }

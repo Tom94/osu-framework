@@ -226,7 +226,7 @@ namespace osu.Framework
             dependencies.CacheAs(Localisation);
 
             frameSyncMode = config.GetBindable<FrameSync>(FrameworkSetting.FrameSync);
-
+            lowLatencyMode = config.GetBindable<LowLatency>(FrameworkSetting.LowLatency);
             executionMode = config.GetBindable<ExecutionMode>(FrameworkSetting.ExecutionMode);
 
             logOverlayVisibility = config.GetBindable<bool>(FrameworkSetting.ShowLogOverlay);
@@ -308,6 +308,8 @@ namespace osu.Framework
         private Bindable<bool> logOverlayVisibility;
 
         private Bindable<FrameSync> frameSyncMode;
+
+        private Bindable<LowLatency> lowLatencyMode;
 
         private Bindable<ExecutionMode> executionMode;
 
@@ -398,10 +400,22 @@ namespace osu.Framework
                 case FrameworkAction.CycleFrameSync:
                     var nextFrameSync = frameSyncMode.Value + 1;
 
-                    if (nextFrameSync > FrameSync.Unlimited)
+                    if (nextFrameSync > FrameSync.Off)
                         nextFrameSync = FrameSync.VSync;
 
                     frameSyncMode.Value = nextFrameSync;
+                    break;
+
+                case FrameworkAction.CycleLowLatency:
+                    var nextLowLatency = lowLatencyMode.Value + 1;
+
+                    if (!Host.Renderer.LowLatencySupported && nextLowLatency != LowLatency.Off)
+                        nextLowLatency = LowLatency.Off;
+
+                    if (nextLowLatency > LowLatency.OnWithBoost)
+                        nextLowLatency = LowLatency.Off;
+
+                    lowLatencyMode.Value = nextLowLatency;
                     break;
 
                 case FrameworkAction.CycleExecutionMode:

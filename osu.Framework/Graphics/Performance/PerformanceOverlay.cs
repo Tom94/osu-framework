@@ -35,6 +35,8 @@ namespace osu.Framework.Graphics.Performance
         private TextFlowContainer? infoText;
 
         private Bindable<FrameSync> configFrameSync = null!;
+        private Bindable<LowLatency> configLowLatency = null!;
+        private Bindable<double> maxFps = null!;
         private Bindable<ExecutionMode> configExecutionMode = null!;
         private Bindable<WindowMode> configWindowMode = null!;
 
@@ -69,6 +71,12 @@ namespace osu.Framework.Graphics.Performance
 
             configFrameSync = config.GetBindable<FrameSync>(FrameworkSetting.FrameSync);
             configFrameSync.BindValueChanged(_ => updateInfoText());
+
+            configLowLatency = config.GetBindable<LowLatency>(FrameworkSetting.LowLatency);
+            configLowLatency.BindValueChanged(_ => updateInfoText());
+
+            maxFps = config.GetBindable<double>(FrameworkSetting.MaxFps);
+            maxFps.BindValueChanged(_ => updateInfoText());
 
             configExecutionMode = config.GetBindable<ExecutionMode>(FrameworkSetting.ExecutionMode);
             configExecutionMode.BindValueChanged(_ => updateInfoText());
@@ -223,15 +231,19 @@ namespace osu.Framework.Graphics.Performance
 
             addHeader("Renderer:");
             addValue(host.RendererInfo);
+            addHeader("Mode:");
+            addValue(configWindowMode.ToString());
 
             infoText.NewLine();
 
-            addHeader("Limiter:");
+            addHeader("Sync:");
             addValue(configFrameSync.ToString());
+            addHeader("Latency:");
+            addValue(configLowLatency.ToString());
+            addHeader("MaxFPS:");
+            addValue(Math.Round(maxFps.Value, 2).ToString());
             addHeader("Execution:");
             addValue(configExecutionMode.ToString());
-            addHeader("Mode:");
-            addValue(configWindowMode.ToString());
 
             switch (host.Window)
             {

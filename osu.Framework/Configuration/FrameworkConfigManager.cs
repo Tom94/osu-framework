@@ -39,7 +39,9 @@ namespace osu.Framework.Configuration
             SetDefault(FrameworkSetting.HardwareVideoDecoder, HardwareVideoDecoder.Any);
             SetDefault(FrameworkSetting.SizeFullscreen, new Size(9999, 9999), new Size(320, 240));
             SetDefault(FrameworkSetting.MinimiseOnFocusLossInFullscreen, RuntimeInfo.IsDesktop);
-            SetDefault(FrameworkSetting.FrameSync, FrameSync.Limit2x);
+            SetDefault(FrameworkSetting.FrameSync, FrameSync.Off);
+            SetDefault(FrameworkSetting.LowLatency, LowLatency.Off);
+            SetDefault(FrameworkSetting.MaxFps, 1000.0, 30.0, 1000.0);
             SetDefault(FrameworkSetting.WindowMode, WindowMode.Windowed);
             SetDefault(FrameworkSetting.Renderer, RendererType.Automatic);
             SetDefault(FrameworkSetting.ShowUnicode, false);
@@ -59,6 +61,7 @@ namespace osu.Framework.Configuration
 
         public override TrackedSettings CreateTrackedSettings() => new TrackedSettings
         {
+            new TrackedSetting<LowLatency>(FrameworkSetting.LowLatency, v => new SettingDescription(v, "Low Latency", v.GetDescription(), "Ctrl+F6")),
             new TrackedSetting<FrameSync>(FrameworkSetting.FrameSync, v => new SettingDescription(v, "Frame Limiter", v.GetDescription(), "Ctrl+F7")),
             new TrackedSetting<string>(FrameworkSetting.AudioDevice, v => new SettingDescription(v, "Audio Device", string.IsNullOrEmpty(v) ? "Default" : v, v)),
             new TrackedSetting<bool>(FrameworkSetting.ShowLogOverlay, v => new SettingDescription(v, "Debug Logs", v ? "visible" : "hidden", "Ctrl+F10")),
@@ -103,6 +106,8 @@ namespace osu.Framework.Configuration
         WindowMode,
         ConfineMouseMode,
         FrameSync,
+        LowLatency,
+        MaxFps,
         ExecutionMode,
 
         ShowUnicode,
