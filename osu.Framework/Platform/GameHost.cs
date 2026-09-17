@@ -1353,7 +1353,7 @@ namespace osu.Framework.Platform
                 maxFpsCustom.Value = maximum_sane_fps;
 
             double drawLimiter = frameSyncMode.Value == FrameSync.Custom ? maxFpsCustom.Value : maxFpsVSync.Value;
-            double updateLimiter = drawLimiter * 2;
+            double updateLimiter = 1000.0f;
 
             if (!AllowBenchmarkUnlimitedFrames)
             {
