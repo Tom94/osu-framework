@@ -59,6 +59,33 @@ namespace osu.Framework.Graphics.Veldrid
         }
 
         /// <summary>
+        /// Whether low latency mode is supported on this device. Currently, only NVIDIA Reflex is supported, but support for AMD anti-lag and
+        /// intel XeLL is planned.
+        /// </summary>
+        public bool LowLatencySupported => Device.LowLatencySupported;
+
+        /// <summary>
+        /// Gets or sets whether the graphics device should attempt to reduce latency by delaying frames until the GPU is ready to present them.
+        /// <see cref="LowLatencyMode.OnWithBoost" /> further hints to the GPU that it should boost its frequency to reduce latency further on
+        /// certain platforms (e.g. NVIDIA Reflex).
+        /// </summary>
+        public LowLatencyMode LowLatencyMode
+        {
+            get => Device.LowLatencyMode;
+            set => Device.LowLatencyMode = value;
+        }
+
+        /// <summary>
+        /// Gets or sets the minimum interval between frames in microseconds while low latency mode is active.
+        /// This option has no effect when <see cref="LowLatencyMode" /> is <see cref="LowLatencyMode.Off" />.
+        /// </summary>
+        public uint LowLatencyMinimumIntervalUs
+        {
+            get => Device.LowLatencyMinimumIntervalUs;
+            set => Device.LowLatencyMinimumIntervalUs = value;
+        }
+
+        /// <summary>
         /// Whether the depth is in the range [0, 1] (i.e. Reversed-Z). If <c>false</c>, depth is in the range [-1, 1].
         /// </summary>
         public bool IsDepthRangeZeroToOne

@@ -164,6 +164,21 @@ namespace osu.Framework.Graphics.Rendering.Deferred
             set => VeldridDevice.AllowTearing = value;
         }
 
+        protected internal override bool LowLatencySupported
+            => VeldridDevice.LowLatencySupported;
+
+        protected internal override LowLatencyMode LowLatencyMode
+        {
+            get => VeldridDevice.LowLatencyMode;
+            set => VeldridDevice.LowLatencyMode = value;
+        }
+
+        protected internal override uint LowLatencyMinimumIntervalUs
+        {
+            get => VeldridDevice.LowLatencyMinimumIntervalUs;
+            set => VeldridDevice.LowLatencyMinimumIntervalUs = value;
+        }
+
         public override bool IsDepthRangeZeroToOne
             => VeldridDevice.IsDepthRangeZeroToOne;
 
