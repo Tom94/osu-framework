@@ -398,7 +398,10 @@ namespace osu.Framework
                 case FrameworkAction.CycleFrameSync:
                     var nextFrameSync = frameSyncMode.Value + 1;
 
-                    if (nextFrameSync > FrameSync.Unlimited)
+                    if (!Host.Renderer.LowLatencySupported && (nextFrameSync == FrameSync.LowLatency || nextFrameSync == FrameSync.LowLatencyBoosted))
+                        nextFrameSync = FrameSync.Custom;
+
+                    if (nextFrameSync > FrameSync.Custom)
                         nextFrameSync = FrameSync.VSync;
 
                     frameSyncMode.Value = nextFrameSync;

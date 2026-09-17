@@ -13,6 +13,7 @@ namespace osu.Framework.Input
             new KeyBinding(new[] { InputKey.Control, InputKey.F1 }, FrameworkAction.ToggleDrawVisualiser),
             new KeyBinding(new[] { InputKey.Control, InputKey.F2 }, FrameworkAction.ToggleGlobalStatistics),
             new KeyBinding(new[] { InputKey.Control, InputKey.F3 }, FrameworkAction.ToggleAtlasVisualiser),
+            new KeyBinding(new[] { InputKey.Control, InputKey.F6 }, FrameworkAction.CycleMaxFps),
             new KeyBinding(new[] { InputKey.Control, InputKey.F7 }, FrameworkAction.CycleFrameSync),
             new KeyBinding(new[] { InputKey.Control, InputKey.Alt, InputKey.F7 }, FrameworkAction.CycleExecutionMode),
             new KeyBinding(new[] { InputKey.Control, InputKey.F11 }, FrameworkAction.CycleFrameStatistics),
@@ -39,6 +40,7 @@ namespace osu.Framework.Input
         ToggleLogOverlay,
         ToggleFullscreen,
         CycleFrameSync,
+        CycleMaxFps,
         CycleExecutionMode,
         ToggleAudioMixerVisualiser
     }

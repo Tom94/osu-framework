@@ -12,16 +12,12 @@ namespace osu.Framework.Configuration
     {
         VSync,
 
-        [Description("2x refresh rate")]
-        Limit2x,
+        [Description("Low latency")]
+        LowLatency,
 
-        [Description("4x refresh rate")]
-        Limit4x,
+        [Description("Low latency (boosted)")]
+        LowLatencyBoosted,
 
-        [Description("8x refresh rate")]
-        Limit8x,
-
-        [Description("Basically unlimited")]
-        Unlimited,
+        Custom,
     }
 }

@@ -39,7 +39,9 @@ namespace osu.Framework.Configuration
             SetDefault(FrameworkSetting.HardwareVideoDecoder, HardwareVideoDecoder.Any);
             SetDefault(FrameworkSetting.SizeFullscreen, new Size(9999, 9999), new Size(320, 240));
             SetDefault(FrameworkSetting.MinimiseOnFocusLossInFullscreen, RuntimeInfo.IsDesktop);
-            SetDefault(FrameworkSetting.FrameSync, FrameSync.Limit2x);
+            SetDefault(FrameworkSetting.FrameSync, FrameSync.Custom);
+            SetDefault(FrameworkSetting.MaxFpsVSync, 0.0);
+            SetDefault(FrameworkSetting.MaxFpsCustom, 1000.0);
             SetDefault(FrameworkSetting.WindowMode, WindowMode.Windowed);
             SetDefault(FrameworkSetting.Renderer, RendererType.Automatic);
             SetDefault(FrameworkSetting.ShowUnicode, false);
@@ -103,6 +105,8 @@ namespace osu.Framework.Configuration
         WindowMode,
         ConfineMouseMode,
         FrameSync,
+        MaxFpsVSync,
+        MaxFpsCustom,
         ExecutionMode,
 
         ShowUnicode,

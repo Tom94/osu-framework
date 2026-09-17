@@ -35,6 +35,8 @@ namespace osu.Framework.Graphics.Performance
         private TextFlowContainer? infoText;
 
         private Bindable<FrameSync> configFrameSync = null!;
+        private Bindable<double> maxFpsVSync = null!;
+        private Bindable<double> maxFpsCustom = null!;
         private Bindable<ExecutionMode> configExecutionMode = null!;
         private Bindable<WindowMode> configWindowMode = null!;
 
@@ -69,6 +71,12 @@ namespace osu.Framework.Graphics.Performance
 
             configFrameSync = config.GetBindable<FrameSync>(FrameworkSetting.FrameSync);
             configFrameSync.BindValueChanged(_ => updateInfoText());
+
+            maxFpsVSync = config.GetBindable<double>(FrameworkSetting.MaxFpsVSync);
+            maxFpsVSync.BindValueChanged(_ => updateInfoText());
+
+            maxFpsCustom = config.GetBindable<double>(FrameworkSetting.MaxFpsCustom);
+            maxFpsCustom.BindValueChanged(_ => updateInfoText());
 
             configExecutionMode = config.GetBindable<ExecutionMode>(FrameworkSetting.ExecutionMode);
             configExecutionMode.BindValueChanged(_ => updateInfoText());
@@ -228,6 +236,8 @@ namespace osu.Framework.Graphics.Performance
 
             addHeader("Limiter:");
             addValue(configFrameSync.ToString());
+            addHeader("FPS:");
+            addValue(((int)Math.Round(configFrameSync.Value == FrameSync.Custom ? maxFpsCustom.Value : maxFpsVSync.Value)).ToString());
             addHeader("Execution:");
             addValue(configExecutionMode.ToString());
             addHeader("Mode:");
