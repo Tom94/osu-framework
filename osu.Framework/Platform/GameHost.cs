@@ -1248,7 +1248,11 @@ namespace osu.Framework.Platform
             }, true);
 
             executionMode = Config.GetBindable<ExecutionMode>(FrameworkSetting.ExecutionMode);
-            executionMode.BindValueChanged(e => threadRunner.ExecutionMode = e.NewValue, true);
+            executionMode.BindValueChanged(e =>
+            {
+                threadRunner.ExecutionMode = e.NewValue;
+                updateFrameSyncMode();
+            }, true);
 
             frameSyncMode = Config.GetBindable<FrameSync>(FrameworkSetting.FrameSync);
             frameSyncMode.ValueChanged += _ => updateFrameSyncMode();
@@ -1383,7 +1387,7 @@ namespace osu.Framework.Platform
             }
 
             MaximumDrawHz = drawLimiter;
-            MaximumUpdateHz = updateLimiter;
+            MaximumUpdateHz = executionMode.Value == ExecutionMode.SingleThread ? drawLimiter : updateLimiter;
         }
 
         private void setVSyncMode()
